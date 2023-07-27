@@ -3,11 +3,12 @@
   <div class="box">
     <CustomHeading1>Sign Up</CustomHeading1>
     <CustomTextInput
-      label="Name"
+      label="Username"
       type="text"
-      placeholder="Enter your name"
-      :value="name"
-      @update:value="name = $event"
+      placeholder="Enter your username"
+      :value="username"
+      required="true"
+      @update:value="username = $event"
     />
     <CustomTextInput
       label="Email"
@@ -31,6 +32,7 @@
 </div>
 </template>
 <script>
+import axios from 'axios';
 import CustomTextInput from "../common/CustomTextInput.vue";
 import CustomAppButton from "../common/CustomAppButton.vue";
 import CustomHeading1 from "../common/CustomHeading1.vue";
@@ -38,6 +40,7 @@ import CustomParagraph from "../common/CustomParagraph.vue";
 import CustomLink from "../common/CustomLink.vue";
 
 export default {
+
   name: "SignUp",
   components: {
     CustomTextInput,
@@ -48,15 +51,33 @@ export default {
   },
   data() {
     return {
-      name: "",
+      username: "",
       email: "",
       password: "",
     };
   },
   methods: {
     submit() {
-      // Handle primary button click
-      console.log(this.name, this.email, this.password);
+      const userData = {
+        username: this.username,
+        email: this.email,
+        password: this.password
+      };
+
+      // Make an API call to the backend to register the user
+      axios.post('http://localhost:5000/api/signup', userData)
+        .then(response => {
+          // Handle the response (e.g., show success message, redirect to login)
+          console.log('User signup successful:', response.data);
+          // Redirect to login page after successful signup
+          this.$router.push('/home');
+        })
+        .catch(error => {
+          // Handle error (e.g., show error message)
+          console.error('User signup failed:', error.response.data);
+          // Show error message to the user
+          alert('Signup failed. Please try again.');
+        });
     },
   },
 };

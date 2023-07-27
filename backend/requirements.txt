@@ -1,5 +1,5 @@
 blinker==1.6.2
-click==8.1.5
+click==8.1.6
 Flask==2.3.2
 Flask-Cors==4.0.0
 itsdangerous==2.1.2
