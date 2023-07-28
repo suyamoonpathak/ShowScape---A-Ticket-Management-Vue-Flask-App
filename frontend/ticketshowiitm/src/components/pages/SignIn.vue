@@ -1,7 +1,7 @@
 <template>
-  <div class="signup-page">
+  <div class="signin-page">
     <div class="box">
-      <CustomHeading1>Sign Up</CustomHeading1>
+      <CustomHeading1>Sign In</CustomHeading1>
       <CustomTextInput
         label="Username"
         type="text"
@@ -11,30 +11,18 @@
         @update:value="username = $event"
       />
       <CustomTextInput
-        label="Email"
-        type="email"
-        placeholder="Enter your email"
-        :value="email"
-        required="true"
-        pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-        @update:value="email = $event"
-      />
-      <CustomTextInput
         label="Password"
         type="password"
         placeholder="Choose a password"
         :value="password"
         required="true"
-        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{5,}$"
         @update:value="password = $event"
       />
-      <CustomCheckbox :value="isAdmin" @input="isAdmin = $event">
-        I am an Admin
-      </CustomCheckbox>
-      <CustomAppButton class="primary" @click="submit">Sign Up</CustomAppButton>
+      <div v-if="hasError" class="error-message">{{ errorMessage }}</div>
+      <CustomAppButton class="primary" @click="submit">Sign In</CustomAppButton>
       <div>
         <CustomParagraph
-          >Already have an account? <CustomLink to="SignIn">Sign In</CustomLink>
+          >Don't have an account? <CustomLink to="SignUp">Sign Up</CustomLink>
         </CustomParagraph>
       </div>
     </div>
@@ -47,58 +35,52 @@ import CustomAppButton from "../common/CustomAppButton.vue";
 import CustomHeading1 from "../common/CustomHeading1.vue";
 import CustomParagraph from "../common/CustomParagraph.vue";
 import CustomLink from "../common/CustomLink.vue";
-import CustomCheckbox from "../common/CustomCheckbox.vue";
 import { decodeJwtToken } from "../../../utils/jwtUtils";
 
 export default {
-  name: "SignUp",
+  name: "SignIn",
   components: {
     CustomTextInput,
     CustomAppButton,
     CustomLink,
     CustomHeading1,
     CustomParagraph,
-    CustomCheckbox,
   },
   data() {
     return {
       username: "",
-      email: "",
       password: "",
-      isAdmin: false,
+      hasError: false,
+      errorMessage: "",
     };
   },
   methods: {
     submit() {
       const userData = {
         username: this.username,
-        email: this.email,
         password: this.password,
-        isAdmin:this.isAdmin
       };
 
-      // Make an API call to the backend to register the user
       axios
-        .post("http://localhost:5000/api/signup", userData)
+        .post("http://localhost:5000/api/signin", userData)
         .then((response) => {
-          // Handle the response (e.g., show success message, redirect to login)
-          console.log("User signup successful:", response.data);
-          localStorage.setItem('access_token', response.data.access_token);
-          const accessToken = localStorage.getItem('access_token');
+          console.log("Signin successful:", response.data);
+          localStorage.setItem("access_token", response.data.access_token);
+
+          const accessToken = localStorage.getItem("access_token");
           const jwtPayload = decodeJwtToken(accessToken);
           const role = jwtPayload.role;
 
-          if (role === 'admin') {
-            this.$router.push('/AdminHome');
+          if (role == "admin") {
+            this.$router.push("/AdminHome");
           } else {
-            this.$router.push('/ClientHome');
+            this.$router.push("/ClientHome");
           }
         })
         .catch((error) => {
-          // Handle error (e.g., show error message)
           console.error("User signup failed:", error.response.data);
-          // Show error message to the user
-          alert("Signup failed. Please try again.");
+          this.hasError = true;
+          this.errorMessage = "Credentials don't match. Please try again";
         });
     },
   },
@@ -117,7 +99,7 @@ export default {
   background: #001232;
 }
 
-.signup-page {
+.signin-page {
   display: flex;
   height: 100vh;
   background-image: url("../../assets/bg.jpg");
@@ -125,7 +107,11 @@ export default {
   background-position: center;
 }
 
-.primary{
+.primary {
   margin: 5% auto;
+}
+
+.error-message{
+  margin-top: 2%;
 }
 </style>

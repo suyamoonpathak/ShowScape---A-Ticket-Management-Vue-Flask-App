@@ -1,22 +1,28 @@
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 
 
 app = Flask(__name__)
 
 app.config.from_object(__name__)
-CORS(app,resources={r"/*":{'origins':'*'}})
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:8080"}})
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
+app.config['JWT_SECRET_KEY'] = 'secret'
 
 db = SQLAlchemy(app)
-
+jwt = JWTManager(app)
 
 from .authentication import authentication
+from .theatre_management import theatre_management
+from .show_management import show_management
+
 app.register_blueprint(authentication, url_prefix="/")
+app.register_blueprint(theatre_management, url_prefix="/")
+app.register_blueprint(show_management, url_prefix="/")
 
 @app.route('/',methods=['GET'])
 def helloWorld():

@@ -13,6 +13,17 @@ class Theatre(db.Model):
     name = db.Column(db.String(120), nullable=False)
     place = db.Column(db.String(120), nullable=False)
     capacity = db.Column(db.Integer, nullable=False)
+    admin_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # New foreign key to link theatre with admin
+    admin = db.relationship('User', backref='theatres')  # Establishing the relationship
+
+    def as_dict(self):
+        return {
+        'id': self.id,
+        'name': self.name,
+        'place': self.place,
+        'capacity': self.capacity,
+        'admin_id':self.admin_id
+    }
     # Add other theatre fields as needed
 
 class Show(db.Model):
