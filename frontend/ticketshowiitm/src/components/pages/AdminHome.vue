@@ -22,6 +22,9 @@ export default {
 <style>
 body{
   background-color: #001232;
+  background-image: url("./../../assets/bg2.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 .admin-home-page{
   display: block;

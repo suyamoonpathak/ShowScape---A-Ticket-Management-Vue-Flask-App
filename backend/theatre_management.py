@@ -1,7 +1,7 @@
 from . import app
 from . import db
 from flask import Blueprint,jsonify,request
-from .models import Theatre
+from .models import Theatre,Show
 
 theatre_management = Blueprint("theatre_management", __name__)
 
@@ -40,8 +40,23 @@ def update_theatre(theatre_id):
 @theatre_management.route('/api/theatres/<int:theatre_id>', methods=['DELETE'])
 def delete_theatre(theatre_id):
     theatre = Theatre.query.get(theatre_id)
-    if theatre:
+    if not theatre:
+        return jsonify({'message': 'Theatre not found'}), 404
+
+    try:
+        # Fetch all the shows associated with the theatre
+        shows = Show.query.filter_by(theatre_id=theatre_id).all()
+
+        # Delete all the associated shows
+        for show in shows:
+            db.session.delete(show)
+
+        # Delete the theatre
         db.session.delete(theatre)
         db.session.commit()
-        return jsonify({'message': 'Theatre deleted successfully'}), 200
-    return jsonify({'message': 'Theatre not found'}), 404
+
+        return jsonify({'message': 'Theatre and associated shows deleted successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'An error occurred while deleting the theatre and associated shows'}), 500
+

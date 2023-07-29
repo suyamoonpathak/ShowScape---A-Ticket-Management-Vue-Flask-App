@@ -2,9 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import TestComponent from '../components/common/TestComponent'
 import SignUp from '../components/pages/SignUp'
 import SignIn from '../components/pages/SignIn'
-import HomePage from '../components/pages/HomePage'
 import ClientHome from '../components/pages/ClientHome'
 import AdminHome from '../components/pages/AdminHome'
+import ErrorPage from '../components/pages/ErrorPage.vue'
 
 import TheatresListForAdmin from '../components/pages/TheatreManagement/TheatresListForAdmin'
 import TheatreDetails from '../components/pages/TheatreManagement/TheatreDetails'
@@ -12,6 +12,7 @@ import EditTheatre from '../components/pages/TheatreManagement/EditTheatre'
 import CreateTheatre from '../components/pages/TheatreManagement/CreateTheatre'
 
 import CreateShow from '../components/pages/ShowManagement/CreateShow'
+import EditShow from '../components/pages/ShowManagement/EditShow'
 import ShowDetails from '../components/pages/ShowManagement/ShowDetails'
 import ShowListFromTheatre from '../components/pages/ShowManagement/ShowListFromTheatre'
 
@@ -28,10 +29,6 @@ const routes = [
   {
     path: '/',
     component: SignUp
-  },
-  {
-    path: '/home',
-    component: HomePage
   },
   {
     path: '/signin',
@@ -86,6 +83,16 @@ const routes = [
     name: 'CreateShow',
     component: CreateShow,
     meta: { requiresAuth: true, isAdmin: true } // Add meta data for authentication and role check
+  },
+  {
+    path: '/edit-show/:theaterid/:showid/',
+    name: 'EditShow',
+    component: EditShow,
+    meta: { requiresAuth: true, isAdmin: true } // Add meta data for authentication and role check
+  },
+  {
+    path: "/:catchAll(.*)", // Use a param with a custom regexp
+    component: ErrorPage,
   },
 ]
 const router = createRouter({

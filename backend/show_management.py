@@ -16,8 +16,11 @@ def get_all_shows():
                 'name': show.name,
                 'rating': show.rating,
                 'tags': show.tags,
-                'ticket_price': show.ticket_price
-                # Add other attributes as needed
+                'ticket_price': show.ticket_price,
+                'theatre_id': show.theatre_id,
+                'start_time': show.start_time,
+                'end_time':show.end_time,
+                'date':show.date
             }
             show_data.append(show_info)
         return jsonify(show_data)
@@ -46,6 +49,9 @@ def get_shows_for_theatre(theatre_id):
             'tags': show.tags,
             'ticket_price': show.ticket_price,
             'theatre_id': show.theatre_id,
+            'start_time': show.start_time,
+            'end_time':show.end_time,
+            'date':show.date
         })
 
     return jsonify(shows_data), 200
@@ -66,11 +72,15 @@ def get_show_by_id(show_id):
         'tags': show.tags,
         'ticket_price': show.ticket_price,
         'theatre_id': show.theatre_id,
+        'start_time': show.start_time,
+        'end_time':show.end_time,
+        'date':show.date
     }
 
     return jsonify(show_data), 200
 
 # API to create a new show
+from datetime import datetime
 @show_management.route('/api/shows', methods=['POST'])
 def create_show():
     data = request.get_json()
@@ -79,16 +89,20 @@ def create_show():
     tags = data.get('tags')
     ticket_price = data.get('ticket_price')
     theatre_id = data.get('theatre_id')
+    start_time=datetime.strptime(data.get('start_time'),'%H:%M')
+    end_time=datetime.strptime(data.get('end_time'),'%H:%M')
+    date=datetime.strptime(data.get('date'), '%Y-%m-%d')
+    user_id=data.get('user_id')
 
-    if not name or not rating or not ticket_price or not theatre_id:
-        return jsonify({'message': 'Name, rating, ticket price, and theatre ID are required.'}), 400
+    if not name or not rating or not ticket_price or not theatre_id or not start_time or not end_time or not date or not user_id:
+        return jsonify({'message': 'Name, rating, ticket price, start time, end time, date, user id and theatre ID are required.'}), 400
 
     # Check if the theatre with given ID exists
     if not Theatre.query.filter_by(id=theatre_id).first():
         return jsonify({'message': 'Theatre with given ID does not exist.'}), 404
 
     # Create a new show and save it to the database
-    new_show = Show(name=name, rating=rating, tags=tags, ticket_price=ticket_price, theatre_id=theatre_id)
+    new_show = Show(name=name, rating=rating, tags=tags, ticket_price=ticket_price, theatre_id=theatre_id, start_time=start_time, end_time=end_time, date=date, user_id=user_id)
     db.session.add(new_show)
     db.session.commit()
 
@@ -103,9 +117,13 @@ def update_show(show_id):
     tags = data.get('tags')
     ticket_price = data.get('ticket_price')
     theatre_id = data.get('theatre_id')
+    start_time=datetime.strptime(data.get('start_time'),'%H:%M')
+    end_time=datetime.strptime(data.get('end_time'),'%H:%M')
+    date=datetime.strptime(data.get('date'), '%Y-%m-%d')
+    user_id=data.get('user_id')
 
     if not name or not rating or not ticket_price or not theatre_id:
-        return jsonify({'message': 'Name, rating, ticket price, and theatre ID are required.'}), 400
+        return jsonify({'message': 'Name, rating, ticket price, user id and theatre ID are required.'}), 400
 
     # Check if the show with given ID exists
     show = Show.query.get(show_id)
@@ -122,6 +140,10 @@ def update_show(show_id):
     show.tags = tags
     show.ticket_price = ticket_price
     show.theatre_id = theatre_id
+    show.start_time = start_time
+    show.end_time = end_time
+    show.date = date
+    show.user_id=user_id
     db.session.commit()
 
     return jsonify({'message': 'Show updated successfully.'}), 200

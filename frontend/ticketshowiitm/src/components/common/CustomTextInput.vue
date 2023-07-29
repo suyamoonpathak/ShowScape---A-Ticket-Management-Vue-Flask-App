@@ -9,6 +9,7 @@
       class="input-field"
       :id="inputId"
       :class="{ error: hasError }"
+      step="any" 
       @input="$emit('update:value', $event.target.value)"
       @blur="validateInput"
     />
@@ -52,7 +53,7 @@ export default {
   methods: {
     validateInput() {
       // Function to validate the input field when it loses focus
-      if (this.required && this.value.trim() === "") {
+      if (this.required && this.value === "") {
         this.hasError = true;
         this.errorMessage = "This field is required.";
       } else if (this.pattern && !new RegExp(this.pattern).test(this.value)) {
@@ -63,6 +64,8 @@ export default {
           this.errorMessage = "Password should be at least 5 characters long with at least a lowercase letter, an uppercase letter and a digit.";
         } else if(this.label=="Username"){ 
           this.errorMessage = "Username should be at least 5 characters long.";
+        } else if(this.label=="Rating"){
+          this.errorMessage = "Rating can only be between 0 and 5";
         }
       } else {
         this.hasError = false;
@@ -117,5 +120,9 @@ export default {
   font-size: 14px;
   margin-top: -10px;
   margin-bottom: 10px;
+}
+
+.input-field::-webkit-calendar-picker-indicator {
+  filter: invert(1); /* This will turn the icon color to white */
 }
 </style>

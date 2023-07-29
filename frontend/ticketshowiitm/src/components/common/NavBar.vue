@@ -36,10 +36,8 @@ export default {
   },
   methods: {
     logout() {
-      // Implement the logout logic here
-      // For example, clear local storage or call an API to logout the user
-      // Redirect the user to the login page
-      this.$router.push('/login');
+      localStorage.removeItem('access_token'); 
+      this.$router.push('SignIn');
     },
   },
 };

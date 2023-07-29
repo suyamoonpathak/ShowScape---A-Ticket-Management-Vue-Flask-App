@@ -1,4 +1,5 @@
 <template>
+  <div class="full-page">
   <div class="edit-theatre-page">
     <CustomHeading1 class="heading">Edit Theatre</CustomHeading1>
     
@@ -30,6 +31,7 @@
       
     </form>
   </div>
+</div>
 </template>
 
 <script>
@@ -101,7 +103,13 @@ export default {
 /* Add styles for the edit theatre page if needed */
 .edit-theatre-page {
   display: block;
-  padding: 10% 20%;
+  width: 50%;
+}
+
+.full-page{
+  display: flex;
+  justify-content: center;
+  padding-top: 10%;
 }
 
 .heading{

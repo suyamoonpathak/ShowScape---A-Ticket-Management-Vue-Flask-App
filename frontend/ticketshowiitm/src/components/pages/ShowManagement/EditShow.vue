@@ -1,45 +1,41 @@
 <template>
   <div class="full-page">
-  <div class="create-show">
-    <CustomHeading1 class="heading">Create Show</CustomHeading1>
-    <form @submit.prevent="submitForm">
+  <div class="edit-show-page">
+    <CustomHeading1 class="heading">Edit Show</CustomHeading1>
+
+    <form @submit.prevent="submit">
       <CustomInputText
         label="Name"
         type="text"
-        placeholder="Enter show name"
+        placeholder="Enter updated name"
         :value="name"
-        required="true"
         @update:value="name = $event"
       />
       <CustomInputText
         label="Rating"
         type="number"
-        placeholder="Enter show rating"
+        placeholder="Enter updated rating"
         :value="rating"
-        required="true"
-        pattern="^(?:[0-5](?:\.[0-9]*)?|5(?:\.0*)?)$"
         @update:value="rating = $event"
       />
       <CustomInputText
         label="Tags"
-        type="string"
-        placeholder="Enter show tags separated by comma"
+        type="text"
+        placeholder="Enter updated tags"
         :value="tags"
-        required="true"
         @update:value="tags = $event"
       />
       <CustomInputText
         label="Ticket Price"
         type="number"
-        placeholder="Enter ticket price of the show"
+        placeholder="Enter updated ticket price"
         :value="ticketPrice"
-        required="true"
         @update:value="ticketPrice = $event"
       />
       <CustomInputText
         label="Start Time"
         type="time"
-        placeholder="Enter starting time of the show"
+        placeholder="Enter udated starting time of the show"
         :value="startTime"
         required="true"
         @update:value="startTime = $event"
@@ -47,7 +43,7 @@
       <CustomInputText
         label="End Time"
         type="time"
-        placeholder="Enter ending time of the show"
+        placeholder="Enter updated ending time of the show"
         :value="endTime"
         required="true"
         @update:value="endTime = $event"
@@ -55,13 +51,14 @@
       <CustomInputText
         label="Date"
         type="date"
-        placeholder="Enter the date of the show"
+        placeholder="Enter updated date of the show"
         :value="date"
         required="true"
         @update:value="date = $event"
       />
+
       <div class="btn">
-      <CustomAppButton type="submit">Create</CustomAppButton>
+        <CustomAppButton type="submit">Save Changes</CustomAppButton>
       </div>
     </form>
   </div>
@@ -73,14 +70,18 @@ import axios from "axios";
 import CustomHeading1 from "../../common/CustomHeading1.vue";
 import CustomInputText from "../../common/CustomTextInput.vue";
 import CustomAppButton from "../../common/CustomAppButton.vue";
+import {formatTime} from "./../../../../utils/formatTimeUtils"
+import { formatDate } from "./../../../../utils/formatDateUtils"
 import { decodeJwtToken } from "./../../../../utils/jwtUtils";
 
 export default {
-  name: "CreateShow",
+  name: "EditShow",
   data() {
     return {
+      showId: this.$route.params.showid,
+      theatre_id: this.$route.params.theaterid,
       name: "",
-      rating: "",
+      rating: null,
       tags: "",
       ticketPrice: null,
       startTime: null,
@@ -93,37 +94,59 @@ export default {
     CustomHeading1,
     CustomInputText,
     CustomAppButton,
-  }, 
+  },
   mounted() {
+    // Fetch the show details from the backend API based on the route parameter 'id'
+    this.fetchShowDetails();
     this.getUserId();
   },
   methods: {
-    submitForm() {
-      const theatreId = this.$route.params.id;
-      console.log(theatreId);
-      const newShow = {
+    async fetchShowDetails() {
+      console.log(this.showId,this.theatre_id);
+      // Make an API call to fetch the show details based on 'showId'
+      // Replace the URL with your backend API endpoint for fetching show details
+      await axios
+        .get(`http://localhost:5000/api/shows/${this.showId}`)
+        .then((response) => {
+          this.name = response.data.name;
+          this.rating=response.data.rating;
+          this.tags=response.data.tags;
+          this.ticketPrice=response.data.ticket_price;
+          this.startTime=formatTime(response.data.start_time);
+          this.endTime=formatTime(response.data.end_time);
+          this.date=formatDate(response.data.date);
+        })
+        .catch((error) => {
+          console.error("Error fetching show details:", error);
+        });
+    },
+    submit() {
+      const updatedShow = {
         name: this.name,
         rating: this.rating,
         tags: this.tags,
         ticket_price: this.ticketPrice,
-        theatre_id: theatreId,
+        theatre_id: this.theatre_id,
         start_time:this.startTime,
         end_time:this.endTime,
         date:this.date,
         user_id:this.user_id
       };
-      console.log(newShow);
-      // Make API call to create a new show
-      axios.post("http://localhost:5000/api/shows", newShow)
+      // Make an API call to update the show details based on 'showId'
+      // Replace the URL with your backend API endpoint for updating show details
+      axios
+        .put(`http://localhost:5000/api/shows/${this.showId}`, updatedShow)
         .then((response) => {
-          console.log("Show created successfully:", response.data);
-          // Redirect to the ShowList page after successful creation
+          console.log("Show updated successfully:", response.data);
+          // Redirect back to the show details page after successful update
           this.$router.push("/AdminHome");
         })
         .catch((error) => {
-          console.error("Error creating show:", error);
+          console.error("Error updating show:", error);
+          // Show error message to the user if needed
         });
     },
+    formatTime,formatDate,
     getUserId(){
         const accessToken = localStorage.getItem("access_token");
         const jwtPayload = decodeJwtToken(accessToken);
@@ -134,8 +157,9 @@ export default {
 };
 </script>
 
-<style>
-.create-show {
+<style scoped>
+/* Add styles for the edit show page if needed */
+.edit-show-page {
   display: block;
   width: 50%;
 }
