@@ -40,6 +40,7 @@ class Show(db.Model):
     date = db.Column(db.DateTime, nullable=False)
     poster = db.Column(db.String(200))  # URL or file path of the picture
     trailer_url = db.Column(db.String(200))  # URL of the trailer video
+    available_seats = db.Column(db.Integer, nullable=False)
     booking = db.relationship('Booking', backref='show', passive_deletes=True, lazy=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
     theatre_id = db.Column(db.Integer, db.ForeignKey('theatre.id', ondelete='CASCADE'), nullable=False)

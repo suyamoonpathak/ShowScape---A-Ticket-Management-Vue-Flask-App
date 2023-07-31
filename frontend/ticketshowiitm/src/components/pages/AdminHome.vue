@@ -1,10 +1,8 @@
 <template>
   <div class="admin-home-page">
-  <Navbar :userRole="'admin'" class="nav"/>
-  <h1>Hi! Welcome to your dashboard</h1>
-  <TheatresListForAdmin class="theatres"></TheatresListForAdmin>
+    <Navbar :userRole="'admin'" class="nav" />
+    <TheatresListForAdmin class="theatres"></TheatresListForAdmin>
   </div>
-
 </template>
 <script>
 import Navbar from "../common/NavBar.vue";
@@ -15,18 +13,19 @@ export default {
     return {};
   },
   components: {
-    Navbar,TheatresListForAdmin
+    Navbar,
+    TheatresListForAdmin,
   },
 };
 </script>
 <style>
-body{
+body {
   background-color: #001232;
   background-image: url("./../../assets/bg2.jpg");
   background-repeat: no-repeat;
   background-size: cover;
 }
-.admin-home-page{
+.admin-home-page {
   display: block;
 }
 </style>

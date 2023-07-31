@@ -64,7 +64,6 @@ export default {
       axios
         .post("http://localhost:5000/api/signin", userData)
         .then((response) => {
-          console.log("Signin successful:", response.data);
           localStorage.setItem("access_token", response.data.access_token);
 
           const accessToken = localStorage.getItem("access_token");

@@ -11,7 +11,6 @@ export function formatTime(datetimeString) {
     
         // Format the time as needed (e.g., HH:mm format)
         const formattedTime = `${hours}:${minutes}`;
-        console.log(formattedTime);
         return formattedTime;
     }
   }

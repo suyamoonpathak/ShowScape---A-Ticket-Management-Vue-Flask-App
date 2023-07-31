@@ -82,7 +82,6 @@ export default {
         .post("http://localhost:5000/api/signup", userData)
         .then((response) => {
           // Handle the response (e.g., show success message, redirect to login)
-          console.log("User signup successful:", response.data);
           localStorage.setItem('access_token', response.data.access_token);
           const accessToken = localStorage.getItem('access_token');
           const jwtPayload = decodeJwtToken(accessToken);

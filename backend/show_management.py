@@ -1,6 +1,10 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from . import db
 from .models import Show, Theatre
+import uuid
+from werkzeug.utils import secure_filename
+import os
+from datetime import datetime
 
 show_management = Blueprint('show_management', __name__)
 
@@ -20,7 +24,10 @@ def get_all_shows():
                 'theatre_id': show.theatre_id,
                 'start_time': show.start_time,
                 'end_time':show.end_time,
-                'date':show.date
+                'date':show.date,
+                'trailer_url':show.trailer_url,
+                'poster':show.poster,
+                'available_seats':show.available_seats
             }
             show_data.append(show_info)
         return jsonify(show_data)
@@ -51,7 +58,10 @@ def get_shows_for_theatre(theatre_id):
             'theatre_id': show.theatre_id,
             'start_time': show.start_time,
             'end_time':show.end_time,
-            'date':show.date
+            'date':show.date,
+            'trailer_url':show.trailer_url,
+            'poster':show.poster,
+            'available_seats':show.available_seats
         })
 
     return jsonify(shows_data), 200
@@ -74,35 +84,52 @@ def get_show_by_id(show_id):
         'theatre_id': show.theatre_id,
         'start_time': show.start_time,
         'end_time':show.end_time,
-        'date':show.date
+        'date':show.date,
+        'trailer_url':show.trailer_url,
+        'poster':show.poster,
+        'available_seats':show.available_seats
     }
 
     return jsonify(show_data), 200
 
+def saveImg(file, fileName):
+    file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], fileName))
 # API to create a new show
-from datetime import datetime
+
 @show_management.route('/api/shows', methods=['POST'])
 def create_show():
-    data = request.get_json()
+    data = request.form
     name = data.get('name')
     rating = data.get('rating')
     tags = data.get('tags')
     ticket_price = data.get('ticket_price')
-    theatre_id = data.get('theatre_id')
-    start_time=datetime.strptime(data.get('start_time'),'%H:%M')
-    end_time=datetime.strptime(data.get('end_time'),'%H:%M')
-    date=datetime.strptime(data.get('date'), '%Y-%m-%d')
-    user_id=data.get('user_id')
+    start_time = datetime.strptime(data.get('start_time'), '%H:%M')
+    end_time = datetime.strptime(data.get('end_time'), '%H:%M')
+    date = datetime.strptime(data.get('date'), '%Y-%m-%d')
+    user_id = data.get('user_id')
+    trailer_url = data.get('trailer_url')
+    posterImg = request.files.get('poster')  # Get the uploaded file
 
-    if not name or not rating or not ticket_price or not theatre_id or not start_time or not end_time or not date or not user_id:
-        return jsonify({'message': 'Name, rating, ticket price, start time, end time, date, user id and theatre ID are required.'}), 400
+    theatre = Theatre.query.get(data.get('theatre_id'))
+    if not theatre:
+        return jsonify({'message': 'Theatre with given ID does not exist.'}), 404
+    theatre_id = theatre.id
+    available_seats = theatre.capacity
+
+
+    if not name or not rating or not ticket_price or not theatre_id or not start_time or not end_time or not date or not user_id or not trailer_url or not posterImg:
+        return jsonify({'message': 'Name, rating, ticket price, start time, end time, date, trailer url, poster, user id and theatre ID are required.'}), 400
 
     # Check if the theatre with given ID exists
-    if not Theatre.query.filter_by(id=theatre_id).first():
-        return jsonify({'message': 'Theatre with given ID does not exist.'}), 404
+
+
+    # Save the uploaded poster image to the server
+    filename = str(uuid.uuid1()) + "_" + secure_filename(posterImg.filename)
+    filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+    posterImg.save(filepath)
 
     # Create a new show and save it to the database
-    new_show = Show(name=name, rating=rating, tags=tags, ticket_price=ticket_price, theatre_id=theatre_id, start_time=start_time, end_time=end_time, date=date, user_id=user_id)
+    new_show = Show(name=name, rating=rating, tags=tags, ticket_price=ticket_price, theatre_id=theatre_id, start_time=start_time, end_time=end_time, date=date, user_id=user_id, trailer_url=trailer_url, poster=filename,available_seats=available_seats)
     db.session.add(new_show)
     db.session.commit()
 
@@ -111,7 +138,7 @@ def create_show():
 # API to update an existing show
 @show_management.route('/api/shows/<int:show_id>', methods=['PUT'])
 def update_show(show_id):
-    data = request.get_json()
+    data = request.form
     name = data.get('name')
     rating = data.get('rating')
     tags = data.get('tags')
@@ -121,9 +148,13 @@ def update_show(show_id):
     end_time=datetime.strptime(data.get('end_time'),'%H:%M')
     date=datetime.strptime(data.get('date'), '%Y-%m-%d')
     user_id=data.get('user_id')
+    trailer_url = data.get('trailer_url')
+    posterImg = request.files.get('poster')
+    available_seats = data.get('available_seats')
 
-    if not name or not rating or not ticket_price or not theatre_id:
-        return jsonify({'message': 'Name, rating, ticket price, user id and theatre ID are required.'}), 400
+
+    if not name or not rating or not ticket_price or not theatre_id or not start_time or not end_time or not date or not user_id or not trailer_url or not posterImg or not available_seats:
+        return jsonify({'message': 'Name, rating, ticket price, start time, end time, date, trailer url, poster, user id and theatre ID are required.'}), 400
 
     # Check if the show with given ID exists
     show = Show.query.get(show_id)
@@ -133,6 +164,10 @@ def update_show(show_id):
     # Check if the theatre with given ID exists
     if not Theatre.query.filter_by(id=theatre_id).first():
         return jsonify({'message': 'Theatre with given ID does not exist.'}), 404
+
+    filename = str(uuid.uuid1()) + "_" + secure_filename(posterImg.filename)
+    filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+    posterImg.save(filepath)
 
     # Update the show details and save changes to the database
     show.name = name
@@ -144,6 +179,9 @@ def update_show(show_id):
     show.end_time = end_time
     show.date = date
     show.user_id=user_id
+    show.trailer_url=trailer_url
+    show.poster=filename
+    show.available_seats=available_seats
     db.session.commit()
 
     return jsonify({'message': 'Show updated successfully.'}), 200

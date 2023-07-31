@@ -9,6 +9,7 @@
       class="input-field"
       :id="inputId"
       :class="{ error: hasError }"
+      accept="image/*"
       step="any" 
       @input="$emit('update:value', $event.target.value)"
       @blur="validateInput"

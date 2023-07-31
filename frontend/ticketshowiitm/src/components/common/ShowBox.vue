@@ -1,3 +1,4 @@
+<!-- this component is for the box that represents each show, it is present inside its theater box, and is visible in the admin dashboard -->
 <template>
     <div class="show-box">
       <div class="show-info">
@@ -35,7 +36,6 @@
     },
     methods: {
       editShow(theatre_id,show_id) {
-        console.log(theatre_id,show_id);
         this.$router.push({ name: 'EditShow', params: { showid: show_id, theaterid: theatre_id} });
         // Handle the logic to edit the selected show
         // You can use router.push() to navigate to the edit show page
@@ -58,10 +58,6 @@
           });
       }
     }, formatTime, formatDate
-    },
-    mounted() {
-    // Call the method to log the passed dummy string after the component is mounted
-    // console.log(this.theatre.id);
     },
   };
   </script>

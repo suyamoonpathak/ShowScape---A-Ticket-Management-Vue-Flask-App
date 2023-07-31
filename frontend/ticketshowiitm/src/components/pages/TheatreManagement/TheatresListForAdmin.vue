@@ -130,7 +130,6 @@ export default {
       // or display a modal for adding the show details
     },
     editTheatre(theatreId) {
-      console.log(theatreId);
       this.$router.push({ name: "EditTheatre", params: { id: theatreId } });
     },
     deleteTheatre(theatreId) {
@@ -225,10 +224,6 @@ li {
   justify-content: left;
   margin-bottom: -30px;
   margin-left: 15px;
-}
-
-.theatresText {
-  color: #ff5252;
 }
 
 .theatre-header h3 {

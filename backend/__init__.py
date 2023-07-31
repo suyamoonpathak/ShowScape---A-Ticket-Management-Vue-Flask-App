@@ -2,6 +2,7 @@ from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
+from os import path
 
 
 app = Flask(__name__)
@@ -12,6 +13,11 @@ CORS(app, resources={r"/api/*": {"origins": "http://localhost:8080"}})
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = 'secret'
+
+UPLOAD_FOLDER = path.join(path.dirname(
+    path.realpath(__file__)), 'static/images/')
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
