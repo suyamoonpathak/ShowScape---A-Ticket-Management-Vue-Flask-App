@@ -11,7 +11,7 @@
     </div>
     <div class="details">
       <div class="inner-details">
-        <p class="name" @click="showDetails(show.id)">{{ show.name }}</p>
+        <p class="name" @click="showDetails(show.id)">{{ getFirstThreeWordsWithEllipsis(show.name) }}</p>
         <star-rating
           v-model:rating="localRating"
           :read-only="true"
@@ -21,9 +21,18 @@
           :star-size="20"
           class="stars"
         ></star-rating>
-        <CustomTags :tagString="show.tags" class="tags" center></CustomTags>
-        <CustomParagraph class="available-seats" v-if="available_seats>0">({{ available_seats }} tickets available)</CustomParagraph>
-        <CustomParagraph class="houseful" v-else>Houseful! <i class="fa-solid fa-face-sad-tear" style="color: #ff5252;"></i> </CustomParagraph>
+        <CustomTags
+          :tagString="getFirstThreeTags(show.tags)"
+          class="tags"
+          center
+        ></CustomTags>
+        <CustomParagraph class="available-seats" v-if="available_seats > 0"
+          >({{ available_seats }} tickets available)</CustomParagraph
+        >
+        <CustomParagraph class="houseful" v-else
+          >Houseful!
+          <i class="fa-solid fa-face-sad-tear" style="color: #ff5252"></i>
+        </CustomParagraph>
       </div>
     </div>
   </div>
@@ -33,6 +42,8 @@
 import StarRating from "vue-star-rating";
 import CustomTags from "./CustomTags.vue";
 import CustomParagraph from "./CustomParagraph.vue";
+import {getFirstThreeTags} from "./../../../utils/getFirstThreeTagsUtils"
+import {getFirstThreeWordsWithEllipsis} from "./../../../utils/getFirstThreeWordsWithEllipsisUtils"
 
 export default {
   props: {
@@ -45,12 +56,13 @@ export default {
     return {
       localRating: this.show.rating, // Initialize the local data property with show.rating
       isZoomed: false,
-      available_seats : this.show.available_seats
+      available_seats: this.show.available_seats,
     };
   },
   components: {
     StarRating,
-    CustomTags,CustomParagraph
+    CustomTags,
+    CustomParagraph,
   },
   methods: {
     zoomIn() {
@@ -60,9 +72,9 @@ export default {
       this.isZoomed = false;
     },
     showDetails(showId) {
-        // Redirect to ShowDetails page for the selected show
-        this.$router.push(`/show/${showId}`);
-      },
+      // Redirect to ShowDetails page for the selected show
+      this.$router.push(`/show/${showId}`);
+    }, getFirstThreeTags, getFirstThreeWordsWithEllipsis
   },
 };
 </script>
@@ -72,6 +84,7 @@ export default {
   height: 505px;
   width: 250px;
   padding: 0 15px 0 15px;
+  margin-bottom: 50px;
 }
 
 .poster {
@@ -79,12 +92,14 @@ export default {
   width: 100%;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
-  transition: transform 0.3s ease; 
+  transition: transform 0.3s ease;
   cursor: pointer;
 }
 
 .poster-div:hover img {
-  transform: scale(1.05); /* Increase the scale value to zoom in (e.g., 1.1 for 10% zoom) */
+  transform: scale(
+    1.05
+  ); /* Increase the scale value to zoom in (e.g., 1.1 for 10% zoom) */
 }
 
 .details {
@@ -108,16 +123,16 @@ p {
   cursor: pointer;
 }
 
-.tags{
-    margin-bottom: 3px;
+.tags {
+  margin-bottom: 3px;
 }
 
 .name:hover {
   color: #ff5252;
 }
 
-.available-seats{
-    color:#6fdf67;
+.available-seats {
+  color: #6fdf67;
 }
 
 .inner-details {
@@ -130,8 +145,7 @@ p {
   margin: 10px 0px;
 }
 
-.houseful{
-    color:#ff5252
+.houseful {
+  color: #ff5252;
 }
-
 </style>

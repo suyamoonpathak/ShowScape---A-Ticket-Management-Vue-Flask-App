@@ -3,7 +3,7 @@
     <div class="show-box">
       <div class="show-info">
         <router-link :to="{ name: 'ShowDetails', params: { id: show.id } }">
-          <h3>{{ show.name }}</h3>
+          <h3>{{ getFirstThreeWordsWithEllipsis(show.name) }}</h3>
         </router-link>
         <p>From {{ formatTime(show.start_time) }} to {{ formatTime(show.end_time) }}</p>
         <p>({{ formatDate(show.date) }})</p>
@@ -20,6 +20,7 @@
   import CustomAppButton from './CustomAppButton.vue';
   import { formatDate } from './../../../utils/formatDateUtils';
   import { formatTime } from './../../../utils/formatTimeUtils';
+  import { getFirstThreeWordsWithEllipsis } from './../../../utils/getFirstThreeWordsWithEllipsisUtils';
 
   export default {
     props: {
@@ -57,7 +58,7 @@
             alert('Failed to delete theatre. Please try again.');
           });
       }
-    }, formatTime, formatDate
+    }, formatTime, formatDate, getFirstThreeWordsWithEllipsis
     },
   };
   </script>

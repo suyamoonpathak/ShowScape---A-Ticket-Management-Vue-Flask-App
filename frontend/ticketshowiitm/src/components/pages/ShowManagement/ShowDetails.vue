@@ -4,7 +4,17 @@
       <CustomHeading1>Show Details</CustomHeading1>
       <div class="wrapper">
         <div class="show-image">
-          <!-- Bind the src attribute to the correct URL of the poster image -->
+          <div class="availability-overlay">
+            <span
+              class="availability-text success"
+              v-if="show.available_seats > 0"
+            >
+              {{ show.available_seats }} Tickets Available
+            </span>
+            <span class="availability-text danger" v-else>
+              No Tickets Available
+            </span>
+          </div>
           <img
             v-if="show.poster"
             :src="
@@ -32,29 +42,62 @@
           </p>
           <hr class="hr-top" />
           <CustomParagraph class="detail"
-            ><i class="far fa-calendar-alt" style="color: #ff5252;"></i> {{ formatDate(show.date) }}</CustomParagraph
+            ><i class="far fa-calendar-alt" style="color: #ff5252"></i>
+            {{ formatDate(show.date) }}</CustomParagraph
           >
           <CustomParagraph class="detail"
-            ><i class="far fa-clock" style="color: #ff5252;"></i> {{ formatTime(show.start_time) }}</CustomParagraph
+            ><i class="far fa-clock" style="color: #ff5252"></i>
+            {{ formatTime(show.start_time) }}</CustomParagraph
           >
           <CustomParagraph class="detail">
             <i class="fas fa-map-marker-alt" style="color: #ff5252"></i>
             {{ theater.name }}, {{ theater.place }}
           </CustomParagraph>
-          <hr class="hr-bottom" />
-          <CustomParagraph class="detail price"
-            >${{ show.ticket_price }}</CustomParagraph
-          >
           <div class="btn-group">
             <CustomAppButton secondary @click="goToTrailer" class="btn"
               >Watch Trailer</CustomAppButton
             >
-            <CustomAppButton class="btn" v-if="userRole === 'client' && show.available_seats>0"
-              >Grab Tickets</CustomAppButton
+          </div>
+          <hr class="hr-bottom" />
+          <CustomParagraph class="detail price"
+            >${{ show.ticket_price }}</CustomParagraph
+          >
+          <div class="ticket-wrapper-div">
+            <div
+              class="ticket-input"
+              v-if="userRole === 'client' && show.available_seats > 0"
             >
-            <CustomParagraph class="houseful" v-if="userRole === 'client' && show.available_seats<=0"
-              >Houseful! <i class="fa-solid fa-face-sad-tear" style="color: #ff5252;"></i></CustomParagraph
-            >
+              <CustomAppButton
+                secondary
+                @click="decreaseTickets"
+                class="arrow-btn"
+              >
+                <i class="fa-solid fa-arrow-down"></i>
+              </CustomAppButton>
+              <div class="number-of-tickets">{{ this.numberOfTickets }}</div>
+              <i class="fa-solid fa-ticket fa-2xl" style="color: #ff5656"></i>
+              <CustomAppButton
+                @click="increaseTickets"
+                class="arrow-btn"
+                :disabled="numberOfTickets >= show.available_seats"
+              >
+                <i class="fa-solid fa-arrow-up fa-beat-fade"></i>
+              </CustomAppButton>
+            </div>
+            <div class="btn-group">
+              <CustomAppButton
+                class="btn"
+                v-if="userRole === 'client' && show.available_seats > 0"
+                @click="submit"
+                >Grab Tickets</CustomAppButton
+              >
+              <CustomParagraph
+                class="houseful"
+                v-if="userRole === 'client' && show.available_seats <= 0"
+                >Houseful!
+                <i class="fa-solid fa-face-sad-tear" style="color: #ff5252"></i
+              ></CustomParagraph>
+            </div>
           </div>
         </div>
       </div>
@@ -82,6 +125,7 @@ export default {
       show: {},
       userRole: null,
       theater: {},
+      numberOfTickets: 1,
     };
   },
   components: {
@@ -111,7 +155,6 @@ export default {
           `http://localhost:5000/api/theatres/${this.show.theatre_id}`
         );
         this.theater = theaterResponse.data;
-
         console.log(this.show);
         console.log(this.theater);
       } catch (error) {
@@ -128,7 +171,6 @@ export default {
         window.open(trailerUrl, "_blank");
       } else {
         console.log("Trailer URL not available.");
-        // Show an error message or handle the case where the trailer URL is not available
       }
     },
     getUserRole() {
@@ -136,13 +178,50 @@ export default {
       const jwtPayload = decodeJwtToken(accessToken);
       this.userRole = jwtPayload.role;
     },
+    getUserId() {
+      const accessToken = localStorage.getItem("access_token");
+      const jwtPayload = decodeJwtToken(accessToken);
+      return jwtPayload.user_id;
+    },
     getPosterImageUrl(posterFilename) {
-      // Replace this path with the actual path to your images
-
       const imagePath = "./../../../../../../backend/static/images/";
       console.log(`${imagePath}${posterFilename}`);
       return `${imagePath}${posterFilename}`;
     },
+    decreaseTickets() {
+      if (this.numberOfTickets > 1) {
+        this.numberOfTickets--;
+      }
+    },
+    increaseTickets() {
+      if (this.numberOfTickets < this.show.available_seats) {
+        this.numberOfTickets++;
+      }
+    },
+    async submit() {
+    if (this.numberOfTickets < 1 || this.numberOfTickets > this.show.available_seats) {
+      alert("Invalid number of tickets.");
+      return;
+    }
+
+    const userId = this.getUserId(); // Replace this with the actual function to get the logged-in user's ID
+    const showId = this.show.id;
+    const numTickets = this.numberOfTickets;
+
+    try {
+      // Create a booking entry in the database
+      await axios.post("http://localhost:5000/api/bookings", {
+        user_id: userId,
+        show_id: showId,
+        num_tickets: numTickets,
+      });
+      this.$router.push('/booking-success');
+
+    } catch (error) {
+      console.error("Error creating booking:", error);
+      this.$router.push('/booking-failed');
+    }
+  },
   },
 };
 </script>
@@ -162,6 +241,8 @@ img {
 
 .show-image {
   margin-right: 5%;
+  position: relative;
+  display: inline-block;
 }
 
 .detail {
@@ -181,11 +262,11 @@ img {
 }
 
 .hr-top {
-  margin-top: 20px;
-  margin-bottom: 15px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 .hr-bottom {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   margin-top: 15px;
 }
 
@@ -215,11 +296,82 @@ img {
   height: 600px;
 }
 
-.houseful{
+.houseful {
   text-align: center;
   margin-top: 30px;
-  color:#ff5252;
+  color: #ff5252;
   font-size: 30px;
   font-weight: bolder;
+}
+
+.btn {
+  margin-top: 5px;
+}
+
+.ticket-input {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+.ticket-input-box {
+  width: 60px;
+  text-align: center;
+  margin: 0 10px;
+}
+
+.arrow-btn {
+  padding: 5px 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.number-of-tickets {
+  font-size: 30px;
+  font-weight: bold;
+  color: #ff5252;
+  margin: 0px 15px;
+}
+
+.fa-ticket {
+  margin-right: 15px;
+  margin-top: 2px;
+}
+
+.availability-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 10%;
+  background-color: rgba(
+    0,
+    0,
+    0,
+    0.7
+  ); /* Change the background color as desired */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  border-bottom-right-radius: 5px;
+}
+
+.availability-text {
+  padding: 10px;
+  text-align: center;
+}
+
+.danger {
+  color: red;
+}
+
+.success {
+  color: #5bfc5b;
 }
 </style>

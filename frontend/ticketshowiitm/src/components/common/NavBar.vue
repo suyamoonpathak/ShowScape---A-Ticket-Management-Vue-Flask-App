@@ -2,9 +2,7 @@
   <nav class="navbar">
     <!-- Logo on the left side -->
     <div class="navbar-logo">
-      <!-- Common logo for both admin and client -->
       <img src="../../assets/logo.png" class="logo">
-      <!-- Add your logo here -->
     </div>
 
     <!-- Navigation links on the right side -->
@@ -18,8 +16,7 @@
 
       <!-- For client -->
       <div v-else-if="userRole === 'client'">
-        <router-link to="/profile">Profile</router-link>
-        <router-link to="/bookings">Bookings</router-link>
+        <router-link to="/my-bookings">My Bookings</router-link>
         <a href="#" @click="logout">Logout</a>
       </div>
     </div>
@@ -66,16 +63,16 @@ export default {
 
 /* Logo styles */
 .navbar-logo {
-  max-width: 100%;
+  width: 100%;
   display: flex;
+  position: absolute;
   justify-content: center;
 }
 
 .logo{
-  width: 10%;
+  width: 13%;
   min-width: 10%;
   height: auto;
-  padding-left: 14%;
 }
 @media (max-width: 768px) {
   .logo {
@@ -90,6 +87,8 @@ export default {
   align-items: center;
   justify-content: flex-end;
   margin-right: 5%;
+  width: 100%;
+  z-index: 5;
 }
 
 .navbar-links a {
@@ -99,9 +98,6 @@ export default {
   margin-left: 20px; /* Adjust the space between links as needed */
 }
 
-.navbar-links a:last-child {
-  margin-right: 0; /* Remove the margin on the last link to prevent extra space */
-}
 
 /* Optional: Add hover and active styles for the links */
 .navbar-links a:hover {

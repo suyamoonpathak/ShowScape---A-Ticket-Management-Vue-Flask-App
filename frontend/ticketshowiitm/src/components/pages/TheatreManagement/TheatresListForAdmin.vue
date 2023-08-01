@@ -90,7 +90,7 @@ export default {
   components: {
     CustomAppButton,
     CustomHeading1,
-    ShowBox,
+    ShowBox
   },
   mounted() {
     // Fetch the list of theatres from the backend API
@@ -197,10 +197,13 @@ li {
   /* Add styles for the card container */
   background-color: white;
   color: black; /* Set text color to black or another visible color */
-  padding: 20px;
+  padding: 10px 20px;
   margin: 10px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  
 }
 
 .empty {
@@ -233,6 +236,7 @@ li {
 
 .showboxes {
   display: flex;
+  flex-wrap: wrap;
 }
 
 .actions {

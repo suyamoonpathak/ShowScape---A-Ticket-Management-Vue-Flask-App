@@ -37,6 +37,7 @@ def signup():
             additional_claims = {
             'username': new_user.username,
             'role': 'client',
+            'user_id':new_user.id
         }
 
     access_token = create_access_token(identity=new_user.id, additional_claims=additional_claims)
@@ -70,6 +71,7 @@ def signin():
             additional_claims = {
             'username': user.username,
             'role': 'client',
+            'user_id':user.id
         }
 
     access_token = create_access_token(identity=user.id, additional_claims=additional_claims)
