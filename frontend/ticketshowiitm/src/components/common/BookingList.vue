@@ -13,8 +13,8 @@
     </div>
     <div class="details">
       <div class="desc">
-        <CustomHeading1 class="heading">{{ booking.show.name }}</CustomHeading1>
-        <CustomTags :tagString="booking.show.tags" class="tags"></CustomTags>
+        <CustomHeading1 class="heading">{{ getFirstThreeWordsWithEllipsis(booking.show.name) }}</CustomHeading1><br>
+        <CustomTags :tagString="getFirstThreeTags(booking.show.tags)" class="tags"></CustomTags>
       </div>
       <div class="rating">
         <star-rating
@@ -49,6 +49,8 @@ import CustomTags from "./CustomTags.vue";
 import StarRating from "vue-star-rating";
 import { formatDate } from "./../../../utils/formatDateUtils";
 import { formatTime } from "./../../../utils/formatTimeUtils";
+import { getFirstThreeTags } from "./../../../utils/getFirstThreeTagsUtils";
+import { getFirstThreeWordsWithEllipsis } from "./../../../utils/getFirstThreeWordsWithEllipsisUtils";
 
 export default {
   props: {
@@ -73,6 +75,8 @@ export default {
     },
     formatDate,
     formatTime,
+    getFirstThreeTags,
+    getFirstThreeWordsWithEllipsis
   },
 };
 </script>
@@ -131,7 +135,7 @@ p {
 .desc{
   display: flex;
   flex-direction: column;
-  align-items: baseline;
+  align-items: left;
 }
 
 .heading {

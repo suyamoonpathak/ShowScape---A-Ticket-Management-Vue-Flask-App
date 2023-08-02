@@ -77,6 +77,7 @@ p {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   cursor: pointer;
+  border-bottom: 1px dashed white;
 }
 
 .poster {

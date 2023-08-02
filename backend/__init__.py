@@ -36,7 +36,7 @@ app.register_blueprint(theatre_management, url_prefix="/")
 app.register_blueprint(show_management, url_prefix="/")
 app.register_blueprint(booking_management,url_prefix="/")
 
-@app.route('/',methods=['GET'])
+@app.route('/test',methods=['GET'])
 def helloWorld():
     return ("Hello Worlds!")
 

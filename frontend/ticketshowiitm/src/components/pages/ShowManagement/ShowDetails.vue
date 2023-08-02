@@ -1,7 +1,11 @@
 <template>
   <div class="full-page">
     <div class="show-details-page">
-      <CustomHeading1>Show Details</CustomHeading1>
+      <div class="upper-content">
+        <CustomHeading1>Show Details</CustomHeading1>
+        <div class="back-btn"><CustomAppButton @click="goBack" primary><i class="fa-solid fa-circle-arrow-left fa-lg"></i> Back</CustomAppButton></div>
+        
+      </div>
       <div class="wrapper">
         <div class="show-image">
           <div class="availability-overlay">
@@ -84,6 +88,11 @@
                 <i class="fa-solid fa-arrow-up fa-beat-fade"></i>
               </CustomAppButton>
             </div>
+            <stripe-checkout
+              ref="checkoutRef"
+              :pk="publishableKey"
+              :session-id="sessionId"
+            />
             <div class="btn-group">
               <CustomAppButton
                 class="btn"
@@ -117,6 +126,7 @@ import { formatDate } from "./../../../../utils/formatDateUtils";
 import { formatCSV } from "./../../../../utils/formatCSVUtils";
 import { calculateDuration } from "./../../../../utils/timeDifferenceUtils";
 import { decodeJwtToken } from "./../../../../utils/jwtUtils";
+import { StripeCheckout } from "@vue-stripe/vue-stripe";
 
 export default {
   name: "ShowDetails",
@@ -126,6 +136,9 @@ export default {
       userRole: null,
       theater: {},
       numberOfTickets: 1,
+      publishableKey:
+        "pk_test_51NaCTwSI0RKb2P1hAkK1KM5hoVbOliU8LWhTpn42B3m441QkVt1BC56AF90z6rOlZNKowE24sP3bPgkVWfhRyjx000lzmmmyhp",
+      sessionId: null,
     };
   },
   components: {
@@ -134,6 +147,7 @@ export default {
     CustomParagraph,
     CustomTags,
     CustomAppButton,
+    StripeCheckout,
   },
   mounted() {
     this.getShowDetails();
@@ -155,6 +169,7 @@ export default {
           `http://localhost:5000/api/theatres/${this.show.theatre_id}`
         );
         this.theater = theaterResponse.data;
+
         console.log(this.show);
         console.log(this.theater);
       } catch (error) {
@@ -198,30 +213,56 @@ export default {
         this.numberOfTickets++;
       }
     },
+    async getStripeSessionId() {
+      const userId = this.getUserId();
+      const ticket_price = this.show.ticket_price;
+      const show_name = this.show.name;
+      const showId=this.show.id
+      const numberOfTickets = this.numberOfTickets;
+      console.log(userId, ticket_price, show_name, numberOfTickets);
+      console.log(this.show);
+      try {
+        // Fetch show details
+        const sessionResponse = await axios.post(
+          "http://localhost:5000/api/checkout",
+          {
+            user_id: userId,
+            ticket_price: ticket_price,
+            num_tickets: numberOfTickets,
+            show_name: show_name,
+            show_id:showId
+          }
+        );
+        this.sessionId = sessionResponse.data.sessionId;
+        console.log(this.sessionId);
+      } catch (error) {
+        console.error("Error getting Stripe Session", error);
+      }
+    },
     async submit() {
-    if (this.numberOfTickets < 1 || this.numberOfTickets > this.show.available_seats) {
-      alert("Invalid number of tickets.");
-      return;
+      if (
+        this.numberOfTickets < 1 ||
+        this.numberOfTickets > this.show.available_seats
+      ) {
+        alert("Invalid number of tickets.");
+        return;
+      }
+      try {
+        // Fetch the session ID
+        await this.getStripeSessionId();
+        console.log(this.$refs.checkoutRef);
+        this.$refs.checkoutRef.redirectToCheckout();
+      } catch (error) {
+        // Handle the error here, if needed
+        console.error(
+          "An error occurred while fetching the session ID:",
+          error
+        );
+      }
+    },
+    goBack(){
+        this.$router.go(-1);
     }
-
-    const userId = this.getUserId(); // Replace this with the actual function to get the logged-in user's ID
-    const showId = this.show.id;
-    const numTickets = this.numberOfTickets;
-
-    try {
-      // Create a booking entry in the database
-      await axios.post("http://localhost:5000/api/bookings", {
-        user_id: userId,
-        show_id: showId,
-        num_tickets: numTickets,
-      });
-      this.$router.push('/booking-success');
-
-    } catch (error) {
-      console.error("Error creating booking:", error);
-      this.$router.push('/booking-failed');
-    }
-  },
   },
 };
 </script>
@@ -251,7 +292,6 @@ img {
 }
 
 .duration {
-  margin-top: -20px;
   margin-bottom: 20px;
   font-size: 16px;
   color: #ff5252;
@@ -374,4 +414,16 @@ img {
 .success {
   color: #5bfc5b;
 }
+
+.upper-content{
+  display: flex;
+  justify-content: space-between;
+}
+
+.back-btn{
+  display: flex;
+  align-items: center;
+  justify-content: right;
+}
+
 </style>

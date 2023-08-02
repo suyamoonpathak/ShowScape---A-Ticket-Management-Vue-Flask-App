@@ -1,6 +1,7 @@
+import json
 from flask import Blueprint, request, jsonify, current_app
 from . import db
-from .models import Show, Theatre
+from .models import Show, Theatre, Booking
 import uuid
 from werkzeug.utils import secure_filename
 import os
@@ -10,7 +11,9 @@ from . import stripe
 
 show_management = Blueprint('show_management', __name__)
 
-#display all shows
+# display all shows
+
+
 @show_management.route('/api/shows', methods=['GET'])
 def get_all_shows():
     try:
@@ -25,11 +28,11 @@ def get_all_shows():
                 'ticket_price': show.ticket_price,
                 'theatre_id': show.theatre_id,
                 'start_time': show.start_time,
-                'end_time':show.end_time,
-                'date':show.date,
-                'trailer_url':show.trailer_url,
-                'poster':show.poster,
-                'available_seats':show.available_seats,
+                'end_time': show.end_time,
+                'date': show.date,
+                'trailer_url': show.trailer_url,
+                'poster': show.poster,
+                'available_seats': show.available_seats,
                 'theatre_name': show.theatre.name,  # Include theatre name
                 'theatre_place': show.theatre.place,  # Include theatre location
             }
@@ -61,16 +64,18 @@ def get_shows_for_theatre(theatre_id):
             'ticket_price': show.ticket_price,
             'theatre_id': show.theatre_id,
             'start_time': show.start_time,
-            'end_time':show.end_time,
-            'date':show.date,
-            'trailer_url':show.trailer_url,
-            'poster':show.poster,
-            'available_seats':show.available_seats
+            'end_time': show.end_time,
+            'date': show.date,
+            'trailer_url': show.trailer_url,
+            'poster': show.poster,
+            'available_seats': show.available_seats
         })
 
     return jsonify(shows_data), 200
 
 # API to get a single show by ID
+
+
 @show_management.route('/api/shows/<int:show_id>', methods=['GET'])
 def get_show_by_id(show_id):
     # Check if the show with given ID exists
@@ -87,18 +92,20 @@ def get_show_by_id(show_id):
         'ticket_price': show.ticket_price,
         'theatre_id': show.theatre_id,
         'start_time': show.start_time,
-        'end_time':show.end_time,
-        'date':show.date,
-        'trailer_url':show.trailer_url,
-        'poster':show.poster,
-        'available_seats':show.available_seats
+        'end_time': show.end_time,
+        'date': show.date,
+        'trailer_url': show.trailer_url,
+        'poster': show.poster,
+        'available_seats': show.available_seats
     }
 
     return jsonify(show_data), 200
 
+
 def saveImg(file, fileName):
     file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], fileName))
 # API to create a new show
+
 
 @show_management.route('/api/shows', methods=['POST'])
 def create_show():
@@ -120,12 +127,10 @@ def create_show():
     theatre_id = theatre.id
     available_seats = theatre.capacity
 
-
     if not name or not rating or not ticket_price or not theatre_id or not start_time or not end_time or not date or not user_id or not trailer_url or not posterImg:
         return jsonify({'message': 'Name, rating, ticket price, start time, end time, date, trailer url, poster, user id and theatre ID are required.'}), 400
 
     # Check if the theatre with given ID exists
-
 
     # Save the uploaded poster image to the server
     filename = str(uuid.uuid1()) + "_" + secure_filename(posterImg.filename)
@@ -133,13 +138,16 @@ def create_show():
     posterImg.save(filepath)
 
     # Create a new show and save it to the database
-    new_show = Show(name=name, rating=rating, tags=tags, ticket_price=ticket_price, theatre_id=theatre_id, start_time=start_time, end_time=end_time, date=date, user_id=user_id, trailer_url=trailer_url, poster=filename,available_seats=available_seats)
+    new_show = Show(name=name, rating=rating, tags=tags, ticket_price=ticket_price, theatre_id=theatre_id, start_time=start_time,
+                    end_time=end_time, date=date, user_id=user_id, trailer_url=trailer_url, poster=filename, available_seats=available_seats)
     db.session.add(new_show)
     db.session.commit()
 
     return jsonify({'message': 'Show created successfully.', 'show_id': new_show.id}), 201
 
 # API to update an existing show
+
+
 @show_management.route('/api/shows/<int:show_id>', methods=['PUT'])
 def update_show(show_id):
     data = request.form
@@ -148,14 +156,13 @@ def update_show(show_id):
     tags = data.get('tags')
     ticket_price = data.get('ticket_price')
     theatre_id = data.get('theatre_id')
-    start_time=datetime.strptime(data.get('start_time'),'%H:%M')
-    end_time=datetime.strptime(data.get('end_time'),'%H:%M')
-    date=datetime.strptime(data.get('date'), '%Y-%m-%d')
-    user_id=data.get('user_id')
+    start_time = datetime.strptime(data.get('start_time'), '%H:%M')
+    end_time = datetime.strptime(data.get('end_time'), '%H:%M')
+    date = datetime.strptime(data.get('date'), '%Y-%m-%d')
+    user_id = data.get('user_id')
     trailer_url = data.get('trailer_url')
     posterImg = request.files.get('poster')
     available_seats = data.get('available_seats')
-
 
     if not name or not rating or not ticket_price or not theatre_id or not start_time or not end_time or not date or not user_id or not trailer_url or not posterImg or not available_seats:
         return jsonify({'message': 'Name, rating, ticket price, start time, end time, date, trailer url, poster, user id and theatre ID are required.'}), 400
@@ -182,15 +189,17 @@ def update_show(show_id):
     show.start_time = start_time
     show.end_time = end_time
     show.date = date
-    show.user_id=user_id
-    show.trailer_url=trailer_url
-    show.poster=filename
-    show.available_seats=available_seats
+    show.user_id = user_id
+    show.trailer_url = trailer_url
+    show.poster = filename
+    show.available_seats = available_seats
     db.session.commit()
 
     return jsonify({'message': 'Show updated successfully.'}), 200
 
 # API to delete a show
+
+
 @show_management.route('/api/shows/<int:show_id>', methods=['DELETE'])
 def delete_show(show_id):
     # Check if the show with given ID exists
@@ -205,6 +214,8 @@ def delete_show(show_id):
     return jsonify({'message': 'Show deleted successfully.'}), 200
 
 # API to search shows based on a single query parameter
+
+
 @show_management.route('/api/shows/search', methods=['GET'])
 def search_shows():
     # Get the search query from query parameters
@@ -235,67 +246,86 @@ def search_shows():
             'date': show.date,
             'trailer_url': show.trailer_url,
             'poster': show.poster,
-            'available_seats':show.available_seats
+            'available_seats': show.available_seats
         })
 
     return jsonify(shows_data), 200
 
 
 @show_management.route("/api/checkout", methods=["POST"])
-def checkout():
-    try:
-        data = request.get_json()
-        show_id = data["showId"]
-        number_of_tickets = data["numberOfTickets"]
+def stripeCheckout():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    show_name = data.get('show_name')
+    ticket_price = str(round(data.get('ticket_price')*100,2))
+    num_tickets = data.get('num_tickets')
+    show_id = data.get('show_id')
 
-        # Fetch the show details from your database based on show_id
-        show = fetch_show_from_database(show_id)
-
-        # Calculate the total amount to charge
-        amount = show['ticket_price'] * number_of_tickets
-
-        # Create a payment intent using the Stripe API
-        intent = stripe.PaymentIntent.create(
-            amount=int(amount * 100),
-            currency="usd",  # Replace with your desired currency
-        )
-
-        # Send the client secret back to the frontend
-        return jsonify({"clientSecret": intent.client_secret})
-
-    except Exception as e:
-        print("Error creating payment intent:", str(e))
-        return jsonify({"error": "An error occurred while creating the payment intent."}), 500
-
-
-def fetch_show_from_database(show_id):
-    try:
-        # Query the database for the Show record with the specified show_id
-        show = Show.query.get(show_id)
-
-        if not show:
-            # If the show does not exist, return an appropriate response
-            return jsonify({'message': 'Show with given ID does not exist.'}), 404
-
-        # Serialize the show data and return as a dictionary
-        show_data = {
-            'id': show.id,
-            'name': show.name,
-            'rating': show.rating,
-            'tags': show.tags,
-            'ticket_price': show.ticket_price,
-            'theatre_id': show.theatre_id,
-            'start_time': show.start_time,
-            'end_time': show.end_time,
-            'date': show.date,
-            'trailer_url': show.trailer_url,
-            'poster': show.poster,
-            'available_seats': show.available_seats
+    
+    session = stripe.checkout.Session.create(
+        payment_method_types=['card'],
+        line_items=[{
+            'price_data': {
+                'unit_amount_decimal': ticket_price,
+                'currency': 'usd',
+                'product_data': {
+                    'name': show_name
+                },
+            },
+            'quantity': num_tickets,
+        },
+        ],
+        mode='payment',
+        success_url='http://localhost:8080/booking-success',
+        cancel_url='http://localhost:8080/booking-failed',
+        metadata={
+            'user_id':user_id,
+            'show_name':show_name,
+            'ticket_price':ticket_price,
+            'num_tickets':num_tickets,
+            'show_id':show_id
         }
-        print(show_data)
-        return show_data
+    )
+    return jsonify({"sessionId":session['id'],"metadata":session.metadata}),200
+
+# Endpoint to handle Stripe webhook events
+@show_management.route("/api/webhooks/stripe", methods=["POST"])
+def handle_stripe_webhook():
+    payload = request.data
+    event = None
+
+    try:
+        event = stripe.Event.construct_from(
+            json.loads(payload), stripe.api_key
+        )
+    except ValueError as e:
+        return jsonify({"error": "Invalid payload"}), 400
+
+    if event.type == "checkout.session.completed":
+        # A payment has been successfully completed
+        session = event.data.object
+
+        # Assuming you have a unique identifier in your session metadata to associate with a booking
+        #from metadata, the values come as string, so type-casting is required
+        user_id = int(session.metadata.get("user_id"))
+        show_id = int(session.metadata.get("show_id"))
+        num_tickets = int(session.metadata.get("num_tickets"))
+
+        # Create the booking and update available_tickets
+        create_and_update_booking(user_id, show_id, num_tickets)
+
+    return jsonify({"status": "success"}), 200
+
+def create_and_update_booking(user_id, show_id, num_tickets):
+    try:
+        # Create a new booking entry
+        booking = Booking(user_id=user_id, show_id=show_id, num_tickets=num_tickets)
+        db.session.add(booking)
+
+        show = Show.query.get(show_id)
+        show.available_seats -= num_tickets
+
+        db.session.commit()
 
     except Exception as e:
-        # Handle any exceptions that occur during database query or serialization
-        # Return an appropriate error response
-        return jsonify({'message': 'Error fetching show details.', 'error': str(e)}), 500
+        db.session.rollback()
