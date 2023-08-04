@@ -101,4 +101,14 @@ span {
   margin: 10px 0;
   color: white;
 }
+
+@media (max-width: 768px) {
+  .all-shows-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
 </style>

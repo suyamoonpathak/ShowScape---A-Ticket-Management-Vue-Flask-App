@@ -92,5 +92,11 @@
     font-size: 80%;
     padding: 10px;
   }
+
+  @media (max-width: 768px) {
+    .show-box {
+      margin-right: 0px;
+    }
+  }
   </style>
   

@@ -13,8 +13,14 @@
     </div>
     <div class="details">
       <div class="desc">
-        <CustomHeading1 class="heading">{{ getFirstThreeWordsWithEllipsis(booking.show.name) }}</CustomHeading1><br>
-        <CustomTags :tagString="getFirstThreeTags(booking.show.tags)" class="tags"></CustomTags>
+        <CustomHeading1 class="heading">{{
+          getFirstThreeWordsWithEllipsis(booking.show.name)
+        }}</CustomHeading1
+        >
+        <CustomTags
+          :tagString="getFirstThreeTags(booking.show.tags)"
+          class="tags"
+        ></CustomTags>
       </div>
       <div class="rating">
         <star-rating
@@ -34,10 +40,19 @@
         </p>
       </div>
       <div class="date">
-        <p><i class="far fa-calendar-alt" style="color: #ff5252"></i> {{ formatDate(booking.show.date) }} at {{ formatTime(booking.show.start_time) }}</p>
+        <p>
+          <i class="far fa-calendar-alt" style="color: #ff5252"></i>
+          {{ formatDate(booking.show.date) }} at
+          {{ formatTime(booking.show.start_time) }}
+        </p>
       </div>
       <div class="price">
-        <p>${{ booking.show.ticket_price }} x {{ booking.num_tickets }} = ${{ booking.show.ticket_price*booking.num_tickets }}</p>
+        <p>
+          <i class="fa-solid fa-money-check-dollar" style="color: #fa5656;"></i>
+          ${{ booking.show.ticket_price }} x {{ booking.num_tickets }} = ${{
+            totalPrice
+          }}
+        </p>
       </div>
     </div>
   </div>
@@ -62,6 +77,10 @@ export default {
   data() {
     return {
       localRating: this.booking.show.rating,
+      totalPrice:
+        Math.round(
+          this.booking.show.ticket_price * this.booking.num_tickets * 100
+        ) / 100, //to round the number into two decimal points
     };
   },
   components: {
@@ -76,7 +95,7 @@ export default {
     formatDate,
     formatTime,
     getFirstThreeTags,
-    getFirstThreeWordsWithEllipsis
+    getFirstThreeWordsWithEllipsis,
   },
 };
 </script>
@@ -117,22 +136,22 @@ p {
   align-items: center;
 }
 
-.place{
+.place {
   display: flex;
   align-items: center;
 }
 
-.date{
+.date {
   display: flex;
   align-items: center;
 }
 
-.price{
+.price {
   display: flex;
   align-items: center;
 }
 
-.desc{
+.desc {
   display: flex;
   flex-direction: column;
   align-items: left;
@@ -145,5 +164,30 @@ p {
 
 .tags {
   margin-top: -10px;
+}
+
+i{
+  margin-right: 2px;
+}
+
+@media (max-width: 768px) {
+  .tags, .rating{
+    display: none;
+  }
+  .details{
+    display: flex;
+    flex-direction: column;
+    padding-left: 5%;
+    margin-top: -10px;
+  }
+  .heading,p,.desc {
+    margin: 0;
+    padding: 0;
+  }
+
+  .heading{
+    text-align: left;
+  }
+
 }
 </style>

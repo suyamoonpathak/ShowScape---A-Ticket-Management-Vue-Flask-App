@@ -3,8 +3,6 @@
     <div class="show-details-page">
       <div class="upper-content">
         <CustomHeading1>Show Details</CustomHeading1>
-        <div class="back-btn"><CustomAppButton @click="goBack" primary><i class="fa-solid fa-circle-arrow-left fa-lg"></i> Back</CustomAppButton></div>
-        
       </div>
       <div class="wrapper">
         <div class="show-image">
@@ -19,7 +17,8 @@
               No Tickets Available
             </span>
           </div>
-          <img
+          <div class="poster-div">
+            <img
             v-if="show.poster"
             :src="
               require(`./../../../../../../backend/static/images/${show.poster}`)
@@ -27,13 +26,16 @@
             alt="Poster Image"
             class="poster"
           />
+          </div>
+          
         </div>
         <div style="color: white" class="show-details">
-          <CustomHeading1>{{ show.name }}</CustomHeading1>
+          <CustomHeading1 class="show-name">{{ show.name }}</CustomHeading1>
           <CustomParagraph class="detail duration">{{
             calculateDuration(show.start_time, show.end_time)
           }}</CustomParagraph>
-          <CustomTags :tagString="show.tags" class="tags"></CustomTags>
+          <CustomTags :tagString="show.tags" class="tags" v-if="windowWidth>400"></CustomTags>
+          <CustomTags :tagString="show.tags" class="tags" center v-else></CustomTags>
           <p>
             <star-rating
               v-model:rating="show.rating"
@@ -127,6 +129,10 @@ import { formatCSV } from "./../../../../utils/formatCSVUtils";
 import { calculateDuration } from "./../../../../utils/timeDifferenceUtils";
 import { decodeJwtToken } from "./../../../../utils/jwtUtils";
 import { StripeCheckout } from "@vue-stripe/vue-stripe";
+import { ref } from 'vue'
+
+
+
 
 export default {
   name: "ShowDetails",
@@ -139,6 +145,7 @@ export default {
       publishableKey:
         "pk_test_51NaCTwSI0RKb2P1hAkK1KM5hoVbOliU8LWhTpn42B3m441QkVt1BC56AF90z6rOlZNKowE24sP3bPgkVWfhRyjx000lzmmmyhp",
       sessionId: null,
+      windowWidth:ref(window.innerWidth)
     };
   },
   components: {
@@ -169,9 +176,6 @@ export default {
           `http://localhost:5000/api/theatres/${this.show.theatre_id}`
         );
         this.theater = theaterResponse.data;
-
-        console.log(this.show);
-        console.log(this.theater);
       } catch (error) {
         console.error("Error getting show and theater details:", error);
       }
@@ -200,7 +204,6 @@ export default {
     },
     getPosterImageUrl(posterFilename) {
       const imagePath = "./../../../../../../backend/static/images/";
-      console.log(`${imagePath}${posterFilename}`);
       return `${imagePath}${posterFilename}`;
     },
     decreaseTickets() {
@@ -217,10 +220,9 @@ export default {
       const userId = this.getUserId();
       const ticket_price = this.show.ticket_price;
       const show_name = this.show.name;
-      const showId=this.show.id
+      const showId = this.show.id;
       const numberOfTickets = this.numberOfTickets;
-      console.log(userId, ticket_price, show_name, numberOfTickets);
-      console.log(this.show);
+
       try {
         // Fetch show details
         const sessionResponse = await axios.post(
@@ -230,11 +232,10 @@ export default {
             ticket_price: ticket_price,
             num_tickets: numberOfTickets,
             show_name: show_name,
-            show_id:showId
+            show_id: showId,
           }
         );
         this.sessionId = sessionResponse.data.sessionId;
-        console.log(this.sessionId);
       } catch (error) {
         console.error("Error getting Stripe Session", error);
       }
@@ -250,7 +251,6 @@ export default {
       try {
         // Fetch the session ID
         await this.getStripeSessionId();
-        console.log(this.$refs.checkoutRef);
         this.$refs.checkoutRef.redirectToCheckout();
       } catch (error) {
         // Handle the error here, if needed
@@ -260,9 +260,6 @@ export default {
         );
       }
     },
-    goBack(){
-        this.$router.go(-1);
-    }
   },
 };
 </script>
@@ -415,15 +412,58 @@ img {
   color: #5bfc5b;
 }
 
-.upper-content{
+.upper-content {
   display: flex;
   justify-content: space-between;
 }
 
-.back-btn{
+.back-btn {
   display: flex;
   align-items: center;
   justify-content: right;
 }
 
+.show-name{
+  margin-bottom: 0px;
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    flex-wrap: wrap;
+  }
+  .upper-content {
+    display: flex;
+    justify-content: center;
+  }
+
+  .show-image {
+  margin-right: 0
+  }
+
+  .poster-div{
+    padding: 0px 10%;
+  }
+
+  .poster {
+    width: 100%;
+    height: 100%;
+  }
+
+  .availability-overlay {
+    margin-left: 10%;
+  }
+
+  .show-details{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  hr{
+    border-left: 1px solid blue;
+    width: 80%;
+  }
+
+}
 </style>

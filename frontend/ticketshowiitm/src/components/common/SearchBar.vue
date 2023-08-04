@@ -9,7 +9,7 @@
       class="search-bar"
     />
     <div v-if="showOverlay" class="search-overlay">
-      <div>
+      <div class="search-results">
         <div v-for="show in filteredShows" :key="show.id">
           <ShowBannerForSearch :show="show" />
           <!-- Add other show details as needed -->
@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import ShowBannerForSearch from './ShowBannerForSearch.vue';
+import ShowBannerForSearch from "./ShowBannerForSearch.vue";
 
 export default {
   data() {
@@ -36,8 +36,8 @@ export default {
       required: true,
     },
   },
-  components:{
-    ShowBannerForSearch
+  components: {
+    ShowBannerForSearch,
   },
   computed: {
     filteredShows() {
@@ -66,7 +66,7 @@ export default {
       }
     },
   },
-  methods:{
+  methods: {
     onInputFocus() {
       this.placeholderText = ""; // Clear the placeholder text on input focus
     },
@@ -115,4 +115,20 @@ export default {
   justify-content: center;
 }
 
+@media (max-width: 768px) {
+  .search-bar {
+    width: 350px;
+    font-size: 20px;
+  }
+
+  .search-bar::placeholder {
+    font-size: 15px;
+  }
+
+  .search-results{
+    width: auto;
+    margin-top: -35%;
+  }
+
+}
 </style>

@@ -122,4 +122,10 @@ export default {
   align-items: center;
   margin-top: 20px;
 }
+
+@media (max-width: 768px) {
+  .edit-theatre-page {
+    width: 100%;
+  }
+}
 </style>

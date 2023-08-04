@@ -2,7 +2,7 @@
   <div class="full-page">
     <div class="create-show">
       <CustomHeading1 class="heading">Create Show</CustomHeading1>
-      <div>
+      <div class="form">
         <CustomInputText
           label="Name"
           type="text"
@@ -68,7 +68,8 @@
           required="true"
           @update:value="trailer_url = $event"
         />
-        <div class="poster-wrapper">>
+        <div class="poster-wrapper">
+          >
           <CustomInputText
             :type="'file'"
             :label="'Upload Poster'"
@@ -84,7 +85,11 @@
             >Upload Poster</CustomAppButton
           >
           <div v-if="posterDisplay" class="poster-img-div">
-            <img :src="posterDisplay" alt="Poster Preview" class="image-preview" />
+            <img
+              :src="posterDisplay"
+              alt="Poster Preview"
+              class="image-preview"
+            />
           </div>
         </div>
         <div class="btn">
@@ -116,7 +121,7 @@ export default {
       user_id: null,
       trailer_url: null,
       posterDisplay: null,
-      posterApi:null,
+      posterApi: null,
       posterURL: null,
     };
   },
@@ -145,14 +150,13 @@ export default {
       formData.append("trailer_url", this.trailer_url);
 
       var posterFile = null;
-      if(this.posterApi){
+      if (this.posterApi) {
         posterFile = new File([this.posterApi], "poster.jpg", {
           type: this.posterApi.type,
         });
       }
       formData.append("poster", posterFile);
       // formData.append("poster",this.poster);
-
 
       // Make API call to create a new show
       axios
@@ -230,5 +234,30 @@ export default {
 
 .upload-poster-btn {
   margin-left: 10%;
+}
+
+@media (max-width: 768px) {
+  .create-show {
+    width: 100%;
+  }
+
+  .image-preview {
+    margin: 0px;
+  }
+
+  .form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .upload-poster-btn{
+    margin: 0;
+    margin-right: 15px;
+  }
+
+  .full-page{
+    padding-bottom: 20px;
+  }
 }
 </style>

@@ -16,41 +16,45 @@
         <li v-for="theatre in theatres" :key="theatre.id">
           <div class="theatre-card">
             <div class="theatre-header">
-              <h1>
-                {{ theatre.name }} | {{ theatre.place }} |
-                {{ theatre.capacity }} Seats
-              </h1>
-              <div class="actions">
+              <span>
+                <h1 class="name-place-capacity">
+                  {{ theatre.name }} | {{ theatre.place }} |
+                  {{ theatre.capacity }} Seats
+                </h1>
+              </span>
+              <span class="actions">
                 <!-- "+" button to add shows -->
                 <CustomAppButton
-                  class="add-show-btn"
+                  class="add-show-btn btn"
                   @click="addShowToTheatre(theatre.id)"
                 >
                   Add Show
                 </CustomAppButton>
                 <!-- Edit and delete buttons -->
                 <CustomAppButton
-                  class="edit-btn"
+                  class="edit-btn btn"
                   @click="editTheatre(theatre.id)"
                   secondary
                 >
                   Edit
                 </CustomAppButton>
                 <CustomAppButton
-                  class="delete-btn"
+                  class="delete-btn btn"
                   @click="deleteTheatre(theatre.id)"
                   secondary
                 >
                   Delete
                 </CustomAppButton>
-              </div>
+              </span>
             </div>
             <div class="show-list">
               <div v-if="showExistsForTheatre(theatre.id)">
                 <!-- Render the ShowBox components for this theater -->
                 <div v-for="group of shows" :key="group" class="showboxes">
                   <div v-for="show in group" :key="show.id">
-                    <span v-if="show.length != 0 && show.theatre_id == theatre.id">
+                    <span
+                      v-if="show.length != 0 && show.theatre_id == theatre.id"
+                    >
                       <ShowBox :show="show" :theatre="theatre" />
                     </span>
                   </div>
@@ -90,7 +94,7 @@ export default {
   components: {
     CustomAppButton,
     CustomHeading1,
-    ShowBox
+    ShowBox,
   },
   mounted() {
     // Fetch the list of theatres from the backend API
@@ -125,9 +129,6 @@ export default {
     },
     addShowToTheatre(theatreId) {
       this.$router.push({ name: "CreateShow", params: { id: theatreId } });
-      // Handle the logic to add a show for the selected theatre
-      // You can use router.push() to navigate to the add show page
-      // or display a modal for adding the show details
     },
     editTheatre(theatreId) {
       this.$router.push({ name: "EditTheatre", params: { id: theatreId } });
@@ -158,7 +159,9 @@ export default {
     showExistsForTheatre(theatreId) {
       // Check if there are shows associated with the given theater ID
       return this.shows.some((group) => {
-        return group.some((show) => show.length !== 0 && show.theatre_id === theatreId);
+        return group.some(
+          (show) => show.length !== 0 && show.theatre_id === theatreId
+        );
       });
     },
   },
@@ -168,7 +171,7 @@ export default {
 <style scoped>
 /* Add styles for the theatres page */
 .theatres-page {
-  background:transparent;
+  background: transparent;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -203,7 +206,6 @@ li {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  
 }
 
 .empty {
@@ -215,7 +217,10 @@ li {
 .theatre-header {
   display: flex;
   justify-content: space-between;
+  position: relative;
   align-items: center;
+  width: 100%;
+  flex-wrap: wrap;
 }
 
 .welcomeText {
@@ -280,4 +285,33 @@ li {
   /* Add styles for the create button at the bottom */
   margin-top: 20px;
 }
+
+.name-place-capacity{
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .actions{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-left: -5px;
+  }
+
+  .actions .btn{
+    padding: 0px 25px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .showboxes{
+    justify-content: center;
+  }
+
+  .name-place-capacity{
+    text-align: center;
+  }
+
+}
+
 </style>

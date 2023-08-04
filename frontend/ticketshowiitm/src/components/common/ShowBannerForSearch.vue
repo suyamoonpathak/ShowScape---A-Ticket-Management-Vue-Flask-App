@@ -118,4 +118,27 @@ p {
   margin-top: -10px;
 }
 
+@media (max-width: 768px) {
+
+    .heading, .tags, p{
+      margin: 0;
+      padding: 0;
+      font-size: 20px;
+    }
+
+    .show-banner-for-search{
+      width: 350px;
+    }
+
+    .details{
+      flex-direction: column;
+      margin-left: 5%;
+    }
+
+    p{
+      font-size: 14px;
+    }
+
+  }
+
 </style>

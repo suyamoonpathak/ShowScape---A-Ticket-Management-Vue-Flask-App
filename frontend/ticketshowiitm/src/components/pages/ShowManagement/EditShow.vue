@@ -251,4 +251,10 @@ export default {
 .upload-poster-btn {
   margin-left: 10%;
 }
+
+@media (max-width: 768px) {
+  .edit-show-page {
+    width: 100%;
+  }
+}
 </style>

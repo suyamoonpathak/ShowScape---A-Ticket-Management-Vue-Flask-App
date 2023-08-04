@@ -104,4 +104,10 @@ export default {
   align-items: center;
   margin-top: 20px;
 }
+
+@media (max-width: 768px) {
+  .create-theatre-page {
+    padding: 10% 0px;
+  }
+}
 </style>

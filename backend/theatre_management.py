@@ -1,7 +1,7 @@
 from . import app
 from . import db
 from flask import Blueprint,jsonify,request
-from .models import Theatre,Show
+from .models import Theatre,Show,Booking
 
 theatre_management = Blueprint("theatre_management", __name__)
 
@@ -47,16 +47,24 @@ def delete_theatre(theatre_id):
         # Fetch all the shows associated with the theatre
         shows = Show.query.filter_by(theatre_id=theatre_id).all()
 
-        # Delete all the associated shows
         for show in shows:
+            # Fetch all bookings associated with the show
+            bookings = Booking.query.filter_by(show_id=show.id).all()
+            print(bookings)
+
+            # Delete all associated bookings for the show
+            for booking in bookings:
+                db.session.delete(booking)
+
+            # Delete the show
             db.session.delete(show)
 
         # Delete the theatre
         db.session.delete(theatre)
         db.session.commit()
 
-        return jsonify({'message': 'Theatre and associated shows deleted successfully'}), 200
+        return jsonify({'message': 'Theatre, associated shows, and bookings deleted successfully'}), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({'message': 'An error occurred while deleting the theatre and associated shows'}), 500
+        return jsonify({'message': 'An error occurred while deleting the theatre, associated shows, and bookings'}), 500
 

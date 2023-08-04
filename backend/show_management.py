@@ -207,6 +207,13 @@ def delete_show(show_id):
     if not show:
         return jsonify({'message': 'Show with given ID does not exist.'}), 404
 
+    bookings = Booking.query.filter_by(show_id=show_id).all()
+    print(bookings)
+
+    # Delete all associated bookings for the show
+    for booking in bookings:
+        db.session.delete(booking)
+
     # Delete the show from the database
     db.session.delete(show)
     db.session.commit()
