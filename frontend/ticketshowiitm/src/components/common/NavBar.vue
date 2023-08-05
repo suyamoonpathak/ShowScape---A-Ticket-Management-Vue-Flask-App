@@ -60,16 +60,13 @@ export default {
 
 /* Navbar styles */
 .navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100%;
   height: 80px; /* Adjust the height as needed */
   background-color: #001232;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
   z-index: 100;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Add a shadow to create a clean layover effect */
   border-bottom: 1px solid white;
@@ -77,10 +74,11 @@ export default {
 
 /* Logo styles */
 .navbar-logo {
+  position: absolute;
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-left: 115px;
+  top:5px;
 }
 
 .logo{
@@ -147,6 +145,7 @@ export default {
   }
 
   .navbar-logo {
+    position: relative;
     margin: 10px 0px; /* Add space above the logo */
     width: auto;
     padding-left: 20px;

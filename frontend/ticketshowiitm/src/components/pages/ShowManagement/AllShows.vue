@@ -70,7 +70,7 @@ span {
 .search {
   display: flex;
   justify-content: center;
-  margin-top: 10%;
+  margin-top: 3%;
   margin-bottom: 3%;
   width: 100%;
 }

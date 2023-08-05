@@ -5,6 +5,9 @@ from flask_jwt_extended import JWTManager
 from os import path
 from .secrets import DATABASE_PATH, JWT_SECRET, STRIPE_SECRET_KEY
 import stripe
+import schedule
+import time
+# from .jobs import send_daily_reminders
 
 app = Flask(__name__)
 
@@ -44,3 +47,8 @@ from .models import User, Theatre, Show, Booking
 with app.app_context():
     db.create_all()
 
+# schedule.every().day.at("11:14").do(send_daily_reminders)
+
+# while True:
+#      schedule.run_pending()
+#      time.sleep(1)

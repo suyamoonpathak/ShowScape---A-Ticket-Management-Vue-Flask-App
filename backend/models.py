@@ -6,9 +6,11 @@ class User(db.Model):
     password = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)  # To differentiate between admin and normal users
+    last_visit = db.Column(db.DateTime)
     theatres=db.relationship('Theatre', backref='user', passive_deletes=True, lazy=True)
     shows=db.relationship('Show', backref='user', passive_deletes=True, lazy=True)
     bookings=db.relationship('Booking', backref='user', passive_deletes=True, lazy=True)
+
     # Add other user fields as needed
 
 class Theatre(db.Model):

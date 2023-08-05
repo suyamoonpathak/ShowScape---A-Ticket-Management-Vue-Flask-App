@@ -13,6 +13,6 @@ export default {
 
 <style>
 #app {
-  margin: -8px -8px;
+  /* margin: -8px -8px; */
 }
 </style>

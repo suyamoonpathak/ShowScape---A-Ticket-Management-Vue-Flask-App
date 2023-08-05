@@ -4,6 +4,8 @@ from . import db
 authentication = Blueprint("authentication", __name__)
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 bcrypt = Bcrypt()
 
@@ -23,7 +25,7 @@ def signup():
         return jsonify({'message': 'Email address already registered. Please use a different email.'}), 400
 
     # Create a new user and save it to the database
-    new_user = User(username=username, email=email, password=password, is_admin=isAdmin)
+    new_user = User(username=username, email=email, password=password, is_admin=isAdmin,last_visit=datetime.now(tz=ZoneInfo('Asia/Kolkata')))
     db.session.add(new_user)
     db.session.commit()
 
@@ -48,7 +50,6 @@ def signin():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
-    isAdmin = data.get('isAdmin')
 
     if not username or not password:
         return jsonify({'message': 'Username and password are required.'}), 400
@@ -61,6 +62,8 @@ def signin():
 
     # Generate an access token for the authenticated user
     if user:
+        user.last_visit = datetime.now(tz=ZoneInfo('Asia/Kolkata'))
+        db.session.commit()
         if(user.is_admin):
             additional_claims = {
             'username': user.username,
