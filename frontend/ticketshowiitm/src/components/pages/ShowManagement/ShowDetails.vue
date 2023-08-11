@@ -94,6 +94,7 @@
               ref="checkoutRef"
               :pk="publishableKey"
               :session-id="sessionId"
+              v-if="userRole === 'client' && show.available_seats > 0"
             />
             <div class="btn-group">
               <CustomAppButton

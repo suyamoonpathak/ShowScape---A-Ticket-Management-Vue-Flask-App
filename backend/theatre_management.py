@@ -1,5 +1,5 @@
 from . import app
-from . import db
+from . import db, redis_client
 from flask import Blueprint,jsonify,request
 from .models import Theatre,Show,Booking
 
@@ -7,13 +7,30 @@ theatre_management = Blueprint("theatre_management", __name__)
 
 @theatre_management.route('/api/theatres/admin/<int:admin_id>', methods=['GET'])
 def get_theatres_for_admin(admin_id):
-    theatres = Theatre.query.filter_by(admin_id=admin_id).all()
-    return jsonify([theatre.as_dict() for theatre in theatres])
+    try:
+        cached_data = redis_client.get(f'theatres_for_admin_{admin_id}')
+        if cached_data:
+            print("from cache")
+            return cached_data, 200
+        theatres = Theatre.query.filter_by(admin_id=admin_id).all()
+        theatres_data = [theatre.as_dict() for theatre in theatres]
+        theatres_data_json = jsonify(theatres_data)
+        redis_client.setex(f'theatres_for_admin_{admin_id}', 5, theatres_data_json.data)
+        return theatres_data_json, 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 @theatre_management.route('/api/theatres/<int:theatre_id>', methods=['GET'])
 def get_theatre_by_id(theatre_id):
+    cached_data = redis_client.get(f'theatres_by_id_{theatre_id}')
+    if cached_data:
+        print("from cache")
+        return cached_data, 200
     theatre = Theatre.query.get(theatre_id)
     if theatre:
+        theatres_data_json = jsonify(theatre.as_dict())
+        redis_client.setex(f'theatres_by_id_{theatre_id}', 5, theatres_data_json.data)
         return jsonify(theatre.as_dict())
     return jsonify({'message': 'Theatre not found'}), 404
 
@@ -42,24 +59,14 @@ def delete_theatre(theatre_id):
     theatre = Theatre.query.get(theatre_id)
     if not theatre:
         return jsonify({'message': 'Theatre not found'}), 404
-
     try:
-        # Fetch all the shows associated with the theatre
         shows = Show.query.filter_by(theatre_id=theatre_id).all()
-
         for show in shows:
-            # Fetch all bookings associated with the show
             bookings = Booking.query.filter_by(show_id=show.id).all()
             print(bookings)
-
-            # Delete all associated bookings for the show
             for booking in bookings:
                 db.session.delete(booking)
-
-            # Delete the show
             db.session.delete(show)
-
-        # Delete the theatre
         db.session.delete(theatre)
         db.session.commit()
 

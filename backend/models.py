@@ -1,4 +1,5 @@
 from . import db
+from datetime import date
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -10,8 +11,6 @@ class User(db.Model):
     theatres=db.relationship('Theatre', backref='user', passive_deletes=True, lazy=True)
     shows=db.relationship('Show', backref='user', passive_deletes=True, lazy=True)
     bookings=db.relationship('Booking', backref='user', passive_deletes=True, lazy=True)
-
-    # Add other user fields as needed
 
 class Theatre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -29,7 +28,6 @@ class Theatre(db.Model):
         'capacity': self.capacity,
         'admin_id':self.admin_id
     }
-    # Add other theatre fields as needed
 
 class Show(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -47,11 +45,22 @@ class Show(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
     theatre_id = db.Column(db.Integer, db.ForeignKey('theatre.id', ondelete='CASCADE'), nullable=False)
 
-    # Add other show fields as needed
-
 class Booking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete="CASCADE"), nullable=False)
     show_id = db.Column(db.Integer, db.ForeignKey('show.id', ondelete="CASCADE"), nullable=False)
     num_tickets = db.Column(db.Integer, nullable=False)
-    # Add other booking fields as needed
+    date_of_booking = db.Column(db.DateTime, nullable=False)
+
+def reminder_recipients():
+    today = date.today()
+    users_to_notify = User.query.filter(User.last_visit < today).all()
+    recipients=[]
+    for user in users_to_notify:
+        recipients.append(user.email)
+    return recipients
+
+def all_users():
+    users = User.query.filter(User.is_admin == 0).all()
+    print(users)
+    return users

@@ -1,22 +1,23 @@
 import json
 from flask import Blueprint, request, jsonify, current_app
-from . import db
+from . import db, redis_client
 from .models import Show, Theatre, Booking
 import uuid
 from werkzeug.utils import secure_filename
 import os
-from datetime import datetime
+from datetime import datetime, date
 from sqlalchemy import or_
 from . import stripe
 
 show_management = Blueprint('show_management', __name__)
 
-# display all shows
-
-
 @show_management.route('/api/shows', methods=['GET'])
 def get_all_shows():
     try:
+        cached_data = redis_client.get('all_shows')
+        if cached_data:
+            return cached_data, 200
+
         shows = Show.query.all()
         show_data = []
         for show in shows:
@@ -33,57 +34,71 @@ def get_all_shows():
                 'trailer_url': show.trailer_url,
                 'poster': show.poster,
                 'available_seats': show.available_seats,
-                'theatre_name': show.theatre.name,  # Include theatre name
-                'theatre_place': show.theatre.place,  # Include theatre location
+                'theatre_name': show.theatre.name,
+                'theatre_place': show.theatre.place,
             }
             show_data.append(show_info)
-        return jsonify(show_data)
+
+        show_data_json = jsonify(show_data)
+        redis_client.setex('all_shows', 10, show_data_json.data)
+
+        return show_data_json, 200
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 
-# API to get all shows for a theatre
+#Get all shows
 @show_management.route('/api/shows/theatre/<int:theatre_id>', methods=['GET'])
 def get_shows_for_theatre(theatre_id):
-    # Check if the theatre with given ID exists
-    theatre = Theatre.query.get(theatre_id)
-    if not theatre:
-        return jsonify({'message': 'Theatre with given ID does not exist.'}), 404
+    try:
+        cached_data = redis_client.get(f'shows_for_theatre_{theatre_id}')
+        if cached_data:
+            return cached_data, 200
 
-    # Get all shows for the theatre
-    shows = Show.query.filter_by(theatre_id=theatre_id).all()
+        theatre = Theatre.query.get(theatre_id)
+        if not theatre:
+            return jsonify({'message': 'Theatre with given ID does not exist.'}), 404
 
-    # Serialize the shows data and return as JSON
-    shows_data = []
-    for show in shows:
-        shows_data.append({
-            'id': show.id,
-            'name': show.name,
-            'rating': show.rating,
-            'tags': show.tags,
-            'ticket_price': show.ticket_price,
-            'theatre_id': show.theatre_id,
-            'start_time': show.start_time,
-            'end_time': show.end_time,
-            'date': show.date,
-            'trailer_url': show.trailer_url,
-            'poster': show.poster,
-            'available_seats': show.available_seats
-        })
+        shows = Show.query.filter_by(theatre_id=theatre_id).all()
 
-    return jsonify(shows_data), 200
+        shows_data = []
+        for show in shows:
+            shows_data.append({
+                'id': show.id,
+                'name': show.name,
+                'rating': show.rating,
+                'tags': show.tags,
+                'ticket_price': show.ticket_price,
+                'theatre_id': show.theatre_id,
+                'start_time': show.start_time,
+                'end_time': show.end_time,
+                'date': show.date,
+                'trailer_url': show.trailer_url,
+                'poster': show.poster,
+                'available_seats': show.available_seats
+            })
+
+        shows_data_json = jsonify(shows_data)
+        redis_client.setex(f'shows_for_theatre_{theatre_id}', 10, shows_data_json.data)
+
+        return shows_data_json, 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 # API to get a single show by ID
-
-
 @show_management.route('/api/shows/<int:show_id>', methods=['GET'])
 def get_show_by_id(show_id):
-    # Check if the show with given ID exists
+    cached_data = redis_client.get(f'show_{show_id}')
+    if cached_data:
+        return cached_data,200
+    
     show = Show.query.get(show_id)
     if not show:
         return jsonify({'message': 'Show with given ID does not exist.'}), 404
 
-    # Serialize the show data and return as JSON
     show_data = {
         'id': show.id,
         'name': show.name,
@@ -98,15 +113,16 @@ def get_show_by_id(show_id):
         'poster': show.poster,
         'available_seats': show.available_seats
     }
+    show_data_json = jsonify(show_data)
+    redis_client.setex(f'show_{show_id}', 10, show_data_json.data)
 
     return jsonify(show_data), 200
 
 
 def saveImg(file, fileName):
     file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], fileName))
+
 # API to create a new show
-
-
 @show_management.route('/api/shows', methods=['POST'])
 def create_show():
     data = request.form
@@ -119,7 +135,7 @@ def create_show():
     date = datetime.strptime(data.get('date'), '%Y-%m-%d')
     user_id = data.get('user_id')
     trailer_url = data.get('trailer_url')
-    posterImg = request.files.get('poster')  # Get the uploaded file
+    posterImg = request.files.get('poster')
 
     theatre = Theatre.query.get(data.get('theatre_id'))
     if not theatre:
@@ -130,14 +146,11 @@ def create_show():
     if not name or not rating or not ticket_price or not theatre_id or not start_time or not end_time or not date or not user_id or not trailer_url or not posterImg:
         return jsonify({'message': 'Name, rating, ticket price, start time, end time, date, trailer url, poster, user id and theatre ID are required.'}), 400
 
-    # Check if the theatre with given ID exists
-
     # Save the uploaded poster image to the server
     filename = str(uuid.uuid1()) + "_" + secure_filename(posterImg.filename)
     filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
     posterImg.save(filepath)
 
-    # Create a new show and save it to the database
     new_show = Show(name=name, rating=rating, tags=tags, ticket_price=ticket_price, theatre_id=theatre_id, start_time=start_time,
                     end_time=end_time, date=date, user_id=user_id, trailer_url=trailer_url, poster=filename, available_seats=available_seats)
     db.session.add(new_show)
@@ -146,8 +159,6 @@ def create_show():
     return jsonify({'message': 'Show created successfully.', 'show_id': new_show.id}), 201
 
 # API to update an existing show
-
-
 @show_management.route('/api/shows/<int:show_id>', methods=['PUT'])
 def update_show(show_id):
     data = request.form
@@ -167,12 +178,10 @@ def update_show(show_id):
     if not name or not rating or not ticket_price or not theatre_id or not start_time or not end_time or not date or not user_id or not trailer_url or not posterImg or not available_seats:
         return jsonify({'message': 'Name, rating, ticket price, start time, end time, date, trailer url, poster, user id and theatre ID are required.'}), 400
 
-    # Check if the show with given ID exists
     show = Show.query.get(show_id)
     if not show:
         return jsonify({'message': 'Show with given ID does not exist.'}), 404
 
-    # Check if the theatre with given ID exists
     if not Theatre.query.filter_by(id=theatre_id).first():
         return jsonify({'message': 'Theatre with given ID does not exist.'}), 404
 
@@ -180,7 +189,6 @@ def update_show(show_id):
     filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
     posterImg.save(filepath)
 
-    # Update the show details and save changes to the database
     show.name = name
     show.rating = rating
     show.tags = tags
@@ -198,11 +206,8 @@ def update_show(show_id):
     return jsonify({'message': 'Show updated successfully.'}), 200
 
 # API to delete a show
-
-
 @show_management.route('/api/shows/<int:show_id>', methods=['DELETE'])
 def delete_show(show_id):
-    # Check if the show with given ID exists
     show = Show.query.get(show_id)
     if not show:
         return jsonify({'message': 'Show with given ID does not exist.'}), 404
@@ -210,21 +215,22 @@ def delete_show(show_id):
     bookings = Booking.query.filter_by(show_id=show_id).all()
     print(bookings)
 
-    # Delete all associated bookings for the show
     for booking in bookings:
         db.session.delete(booking)
 
-    # Delete the show from the database
     db.session.delete(show)
     db.session.commit()
 
     return jsonify({'message': 'Show deleted successfully.'}), 200
 
 # API to search shows based on a single query parameter
-
-
 @show_management.route('/api/shows/search', methods=['GET'])
 def search_shows():
+    cached_data = redis_client.get('search_results')
+    if cached_data:
+        print("search cache")
+        return cached_data,200
+
     # Get the search query from query parameters
     search_query = request.args.get('q')
 
@@ -238,7 +244,6 @@ def search_shows():
         )
     ).all()
 
-    # Serialize the shows data and return as JSON
     shows_data = []
     for show in shows:
         shows_data.append({
@@ -255,6 +260,9 @@ def search_shows():
             'poster': show.poster,
             'available_seats': show.available_seats
         })
+
+    search_results_json = jsonify(shows_data)
+    redis_client.setex('search_results',10,search_results_json.data)
 
     return jsonify(shows_data), 200
 
@@ -311,9 +319,6 @@ def handle_stripe_webhook():
     if event.type == "checkout.session.completed":
         # A payment has been successfully completed
         session = event.data.object
-
-        # Assuming you have a unique identifier in your session metadata to associate with a booking
-        #from metadata, the values come as string, so type-casting is required
         user_id = int(session.metadata.get("user_id"))
         show_id = int(session.metadata.get("show_id"))
         num_tickets = int(session.metadata.get("num_tickets"))
@@ -325,8 +330,7 @@ def handle_stripe_webhook():
 
 def create_and_update_booking(user_id, show_id, num_tickets):
     try:
-        # Create a new booking entry
-        booking = Booking(user_id=user_id, show_id=show_id, num_tickets=num_tickets)
+        booking = Booking(user_id=user_id, show_id=show_id, num_tickets=num_tickets, date_of_booking=date.today())
         db.session.add(booking)
 
         show = Show.query.get(show_id)

@@ -16,7 +16,6 @@
       <!-- Show different links based on user role -->
       <!-- For admin -->
       <div v-if="userRole === 'admin'" class="navbar-links-group">
-        <router-link to="/summary">Summary</router-link>
         <a href="#" @click="logout">Logout</a>
       </div>
 

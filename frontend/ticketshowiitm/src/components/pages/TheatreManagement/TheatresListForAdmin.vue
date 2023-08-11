@@ -23,28 +23,38 @@
                 </h1>
               </span>
               <span class="actions">
-                <!-- "+" button to add shows -->
-                <CustomAppButton
-                  class="add-show-btn btn"
-                  @click="addShowToTheatre(theatre.id)"
-                >
-                  Add Show
-                </CustomAppButton>
-                <!-- Edit and delete buttons -->
-                <CustomAppButton
-                  class="edit-btn btn"
-                  @click="editTheatre(theatre.id)"
-                  secondary
-                >
-                  Edit
-                </CustomAppButton>
-                <CustomAppButton
-                  class="delete-btn btn"
-                  @click="deleteTheatre(theatre.id)"
-                  secondary
-                >
-                  Delete
-                </CustomAppButton>
+                <div class="add-export">
+                  <CustomAppButton
+                    class="add-show-btn btn"
+                    @click="addShowToTheatre(theatre.id)"
+                  >
+                    Add Show
+                  </CustomAppButton>
+                  <CustomAppButton
+                    class="export-btn btn"
+                    secondary
+                    @click="exportCsv(theatre.id)"
+                  >
+                    Export
+                  </CustomAppButton>
+                </div>
+
+                <div class="edit-delete">
+                  <CustomAppButton
+                    class="edit-btn btn"
+                    @click="editTheatre(theatre.id)"
+                    secondary
+                  >
+                    Edit
+                  </CustomAppButton>
+                  <CustomAppButton
+                    class="delete-btn btn"
+                    @click="deleteTheatre(theatre.id)"
+                    secondary
+                  >
+                    Delete
+                  </CustomAppButton>
+                </div>
               </span>
             </div>
             <div class="show-list">
@@ -164,6 +174,20 @@ export default {
         );
       });
     },
+    exportCsv(theatreId) {
+      alert("CSV export triggered");
+      // Make an API call to trigger the CSV export
+      axios
+        .get(`http://localhost:5000/api/export-csv/${theatreId}`) // Update the API endpoint
+        .then((response) => {
+          console.log("CSV export completed:", response.data);
+          alert("CSV export completed. Please check your email for the file.");
+        })
+        .catch((error) => {
+          console.error("Error sending CSV export:", error.response.data);
+          alert("Failed to send CSV export in the mail. Please try again.");
+        });
+    },
   },
 };
 </script>
@@ -251,7 +275,8 @@ li {
 
 .add-show-btn,
 .edit-btn,
-.delete-btn {
+.delete-btn,
+.export-btn {
   margin-left: 10px;
 }
 
@@ -286,32 +311,37 @@ li {
   margin-top: 20px;
 }
 
-.name-place-capacity{
+.name-place-capacity {
   margin: 0;
 }
 
+.add-export,
+.edit-delete {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 768px) {
-  .actions{
+  .actions {
     width: 100%;
     display: flex;
     justify-content: center;
     margin-left: -5px;
   }
 
-  .actions .btn{
+  .actions .btn {
     padding: 0px 25px;
+    width: 100%;
     font-size: 12px;
     font-weight: bold;
   }
 
-  .showboxes{
+  .showboxes {
     justify-content: center;
   }
 
-  .name-place-capacity{
+  .name-place-capacity {
     text-align: center;
   }
-
 }
-
 </style>

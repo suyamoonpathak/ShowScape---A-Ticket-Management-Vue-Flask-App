@@ -1,0 +1,57 @@
+<html>
+  <head>
+    <title>Monthly Entertainment Report</title>
+  </head>
+  <body>
+    <h1>Monthly Entertainment Report</h1>
+    <table border="1">
+      <tr>
+        <th>Show</th>
+        <th>Rating</th>
+        <th>Number of tickets</th>
+        <th>Price per ticket</th>
+        <th>Total price</th>
+      </tr>
+      {% for booking in booking_list %}
+      <tr>
+        <td>{{ booking.show.name }}</td>
+        <td>{{ booking.show.rating }}</td>
+        <td>{{ booking.num_tickets }}</td>
+        <td>{{ booking.show.ticket_price }}</td>
+        <td>{{ booking.num_tickets * booking.show.ticket_price }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    <h1>Total for this month: ${{ total_price }}</h1>
+    <div id="pie-chart"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/plotly@5.3.1/dist/plotly.min.js"></script>
+    <script type="text/javascript">
+      var total_price = {{ total_price }};
+      var booking_list = {{ booking_list | tojson }};
+
+      var labels = [];
+      var values = [];
+
+      for (var i = 0; i < booking_list.length; i++) {
+        labels.push(booking_list[i].show.name);
+        values.push(booking_list[i].num_tickets * booking_list[i].show.ticket_price);
+      }
+
+      var data = [
+        {
+          values: values,
+          labels: labels,
+          type: 'pie'
+        }
+      ];
+
+      var layout = {
+        height: 400,
+        width: 500
+      };
+
+      Plotly.newPlot('pie-chart', data, layout);
+    </script>
+  </body>
+</html>
