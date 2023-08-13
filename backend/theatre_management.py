@@ -1,4 +1,3 @@
-from . import app
 from . import db, redis_client
 from flask import Blueprint,jsonify,request
 from .models import Theatre,Show,Booking
@@ -72,3 +71,34 @@ def delete_theatre(theatre_id):
         db.session.rollback()
         return jsonify({'message': 'An error occurred while deleting the theatre, associated shows, and bookings'}), 500
 
+@theatre_management.route('/api/generate_arrays/<int:admin_id>', methods=['GET'])
+def generate_arrays(admin_id):
+    try:
+        # Query theaters based on admin_id
+        theatres = Theatre.query.filter_by(admin_id=admin_id).all()
+
+        theatre_data = {}  # Dictionary to store data for each theatre
+
+        for theatre in theatres:
+            theatre_capacity = theatre.capacity
+            shows = Show.query.filter_by(theatre_id=theatre.id).all()
+
+            capacity_array = []
+            revenue_array = []
+
+            for show in shows:
+                available_seats = show.available_seats
+                ticket_price = show.ticket_price
+                revenue = (theatre_capacity - available_seats) * ticket_price
+
+                capacity_array.append({'label': show.name, 'y': theatre_capacity - available_seats})
+                revenue_array.append({'label': show.name, 'y': revenue})
+
+            theatre_data[theatre.name] = {
+                'capacity_array': capacity_array,
+                'revenue_array': revenue_array
+            }
+
+        return jsonify(theatre_data)
+    except Exception as e:
+        return jsonify({'error': str(e)})

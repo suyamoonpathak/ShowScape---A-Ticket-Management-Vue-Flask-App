@@ -1,21 +1,23 @@
 <template>
   <nav class="navbar">
-    
     <div class="nav-wrapper">
-    <!-- Logo on the left side -->
-    <div class="navbar-logo">
-      <img src="../../assets/logo.png" class="logo">
+      <!-- Logo on the left side -->
+      <div class="navbar-logo">
+        <img src="../../assets/logo.png" class="logo" />
+      </div>
+      <div class="navbar-hamburger" @click="toggleMenu">
+        <i class="fa-solid fa-bars fa-xl"></i>
+      </div>
     </div>
-    <div class="navbar-hamburger" @click="toggleMenu">
-      <i class="fa-solid fa-bars fa-xl"></i>
-    </div>
-  </div>
 
     <!-- Navigation links on the right side -->
     <div class="navbar-links" :class="{ 'navbar-links-open': menuOpen }">
       <!-- Show different links based on user role -->
       <!-- For admin -->
       <div v-if="userRole === 'admin'" class="navbar-links-group">
+        <router-link :to="summaryOrHome">
+          {{ summaryOrHomeText }}
+        </router-link>
         <a href="#" @click="logout">Logout</a>
       </div>
 
@@ -43,18 +45,31 @@ export default {
   },
   methods: {
     logout() {
-      localStorage.removeItem('access_token'); 
-      this.$router.push('SignIn');
+      localStorage.removeItem("access_token");
+      this.$router.push("SignIn");
     },
     toggleMenu() {
       this.menuOpen = !this.menuOpen; // Toggle the menu open state
+    },
+    
+  },
+  computed: {
+    summaryOrHome() {
+      // Check the current route and return the appropriate link
+      if (this.$route.path === '/summary') {
+        return '/adminhome';
+      }
+      return '/summary';
+    },
+    summaryOrHomeText() {
+      // Change the link text based on the current route
+      return this.$route.path === '/summary' ? 'Home' : 'Summary';
     },
   },
 };
 </script>
 
 <style>
-
 /* Reset default margin and padding */
 
 /* Navbar styles */
@@ -77,10 +92,10 @@ export default {
   width: 100%;
   display: flex;
   justify-content: center;
-  top:5px;
+  top: 5px;
 }
 
-.logo{
+.logo {
   width: 13%;
   min-width: 10%;
   height: auto;
@@ -103,11 +118,9 @@ export default {
   margin-left: 20px; /* Adjust the space between links as needed */
 }
 
-
 /* Optional: Add hover and active styles for the links */
 .navbar-links a:hover {
   color: #ff5252; /* Change the color on hover */
-
 }
 
 /* Optional: Active link style (when the link is active/selected) */
@@ -115,9 +128,9 @@ export default {
   font-weight: bold;
 }
 
-.navbar-hamburger{
-    display: none;
-  }
+.navbar-hamburger {
+  display: none;
+}
 
 @media (max-width: 768px) {
   .navbar {
@@ -129,16 +142,16 @@ export default {
     background: transparent;
   }
 
-  .nav-wrapper{
+  .nav-wrapper {
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
   }
 
-  .navbar-hamburger{
+  .navbar-hamburger {
     display: inline-block;
-    color:white;
+    color: white;
     margin-top: 15px;
     padding-right: 20px;
   }
@@ -150,7 +163,7 @@ export default {
     padding-left: 20px;
   }
 
-  .logo{
+  .logo {
     height: 60px;
     width: auto;
   }
@@ -172,7 +185,7 @@ export default {
 
   .navbar-links-open {
     max-height: 200px;
-    width: 100%
+    width: 100%;
   }
 
   .navbar-links-group {
@@ -188,5 +201,4 @@ export default {
     margin: 10px 0; /* Add spacing between links */
   }
 }
-
 </style>

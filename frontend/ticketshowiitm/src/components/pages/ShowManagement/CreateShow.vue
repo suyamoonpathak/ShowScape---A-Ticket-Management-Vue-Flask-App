@@ -29,7 +29,7 @@
           @update:value="tags = $event"
         />
         <CustomInputText
-          label="Ticket Price"
+          label="Ticket Price ($)"
           type="number"
           placeholder="Enter ticket price of the show"
           :value="ticketPrice"

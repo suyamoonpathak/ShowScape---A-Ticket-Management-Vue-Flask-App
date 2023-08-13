@@ -1,6 +1,7 @@
 <template>
   <div class="signin-page">
     <div class="box">
+      <img src="./../../assets/logo.png" class="logo">
       <CustomHeading1>Sign In</CustomHeading1>
       <CustomTextInput
         label="Username"
@@ -114,7 +115,18 @@ export default {
   margin: 5% auto;
 }
 
+.logo{
+  width: 50%;
+}
+
 .error-message {
   margin-top: 2%;
 }
+
+@media (max-width: 768px) {
+  .logo{
+  width: 70%;
+}
+}
+
 </style>

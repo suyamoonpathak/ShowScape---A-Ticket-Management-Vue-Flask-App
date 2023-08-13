@@ -142,7 +142,7 @@ def send_entertainment_report():
                 print(f"Error sending report: {e}")
 
 hour_of_schedule = 20
-minute_of_schedule = 0
+minute_of_schedule = 00
 
 scheduler.add_job(id="reminder-job", func=send_daily_reminders, trigger='cron', hour=hour_of_schedule, minute=minute_of_schedule)
 scheduler.add_job(id="entertainment-report-job", func=send_entertainment_report, trigger='cron', day=1, hour=hour_of_schedule, minute=minute_of_schedule)

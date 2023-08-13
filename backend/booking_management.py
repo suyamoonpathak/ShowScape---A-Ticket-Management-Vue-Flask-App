@@ -51,3 +51,5 @@ def get_user_bookings(user_id):
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+

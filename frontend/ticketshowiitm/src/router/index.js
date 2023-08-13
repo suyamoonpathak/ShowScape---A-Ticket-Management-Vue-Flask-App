@@ -4,6 +4,7 @@ import SignIn from "../components/pages/SignIn";
 import ClientHome from "../components/pages/ClientHome";
 import AdminHome from "../components/pages/AdminHome";
 import ErrorPage from "../components/pages/ErrorPage.vue";
+import TheatreSummary from "../components/pages/TheatreSummary.vue"
 
 import TheatresListForAdmin from "../components/pages/TheatreManagement/TheatresListForAdmin";
 import TheatreDetails from "../components/pages/TheatreManagement/TheatreDetails";
@@ -100,6 +101,11 @@ const routes = [
     path:"/my-bookings",
     component: MyBookings,
     meta: { requiresAuth: true, requiredRole: "client"},
+  },
+  {
+    path:"/summary",
+    component: TheatreSummary,
+    meta: { requiresAuth: true, requiredRole: "admin"},
   },
   {
     path: "/:catchAll(.*)", // Use a param with a custom regexp

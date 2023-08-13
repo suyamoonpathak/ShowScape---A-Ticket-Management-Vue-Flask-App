@@ -48,7 +48,7 @@ def get_all_shows():
         return jsonify({'error': str(e)}), 500
 
 
-#Get all shows
+#Get all shows from a specific theatre
 @show_management.route('/api/shows/theatre/<int:theatre_id>', methods=['GET'])
 def get_shows_for_theatre(theatre_id):
     try:

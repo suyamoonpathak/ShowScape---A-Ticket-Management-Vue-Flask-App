@@ -1,6 +1,7 @@
 <template>
   <div class="signup-page">
     <div class="box">
+      <img src="./../../assets/logo.png" class="logo">
       <CustomHeading1>Sign Up</CustomHeading1>
       <CustomTextInput
         label="Username"
@@ -131,4 +132,15 @@ export default {
 .primary {
   margin: 5% auto;
 }
+
+.logo{
+  width: 50%;
+}
+
+@media (max-width: 768px) {
+  .logo{
+  width: 70%;
+}
+}
+
 </style>
