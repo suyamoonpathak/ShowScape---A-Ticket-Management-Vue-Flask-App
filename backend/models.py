@@ -62,5 +62,4 @@ def reminder_recipients():
 
 def all_users():
     users = User.query.filter(User.is_admin == 0).all()
-    print(users)
     return users

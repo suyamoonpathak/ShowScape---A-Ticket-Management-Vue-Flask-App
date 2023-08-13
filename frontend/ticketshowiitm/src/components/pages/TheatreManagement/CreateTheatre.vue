@@ -57,7 +57,7 @@ export default {
   methods: {
     submit() {
       if (!this.name || !this.place || !this.capacity) {
-        alert("Enter all the values");
+        alert("Enter all the fields");
       } else {
         const accessToken = localStorage.getItem("access_token");
         const jwtPayload = decodeJwtToken(accessToken);

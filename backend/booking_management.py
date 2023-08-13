@@ -1,5 +1,5 @@
-from flask import Blueprint, jsonify, render_template
-from . import db, redis_client
+from flask import Blueprint, jsonify
+from . import redis_client
 from .models import Booking, Show, User, Theatre
 
 booking_management = Blueprint('booking_management', __name__)

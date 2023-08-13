@@ -9,6 +9,7 @@
           type="text"
           placeholder="Enter updated name"
           :value="name"
+          required="true"
           @update:value="name = $event"
         />
         <CustomInputText
@@ -16,6 +17,7 @@
           type="number"
           placeholder="Enter updated rating"
           :value="rating"
+          required="true"
           @update:value="rating = $event"
         />
         <CustomInputText
@@ -23,6 +25,7 @@
           type="text"
           placeholder="Enter updated tags"
           :value="tags"
+          required="true"
           @update:value="tags = $event"
         />
         <CustomInputText
@@ -30,6 +33,7 @@
           type="number"
           placeholder="Enter updated ticket price"
           :value="ticketPrice"
+          required="true"
           @update:value="ticketPrice = $event"
         />
         <CustomInputText
@@ -61,6 +65,7 @@
           type="url"
           placeholder="Enter updated trailer URL"
           :value="trailer_url"
+          required="true"
           @update:value="trailer_url = $event"
         />
         <div class="poster-wrapper">
@@ -80,7 +85,11 @@
             Edit Poster
           </CustomAppButton>
           <div v-if="posterDisplay" class="poster-img-div">
-            <img :src="posterDisplay" alt="Poster Preview" class="image-preview" />
+            <img
+              :src="posterDisplay"
+              alt="Poster Preview"
+              class="image-preview"
+            />
           </div>
         </div>
         <div class="btn">
@@ -145,51 +154,62 @@ export default {
           this.date = formatDate(response.data.date);
           this.trailer_url = response.data.trailer_url;
           this.posterDisplay = require(`./../../../../../../backend/static/images/${response.data.poster}`);
-          
         })
         .catch((error) => {
           console.error("Error fetching show details:", error);
         });
     },
     submit() {
-      const theatreId = this.$route.params.theaterid;
+      if (
+        !this.name ||
+        !this.rating ||
+        !this.tags ||
+        !this.ticketPrice ||
+        !this.startTime ||
+        !this.endTime ||
+        !this.date ||
+        !this.trailer_url
+      ) {
+        alert("Enter all the fields");
+      } else {
+        const theatreId = this.$route.params.theaterid;
 
-      const formData = new FormData();
-      formData.append("name", this.name);
-      formData.append("rating", this.rating);
-      formData.append("tags", this.tags);
-      formData.append("ticket_price", this.ticketPrice);
-      formData.append("theatre_id", theatreId);
-      formData.append("start_time", this.startTime);
-      formData.append("end_time", this.endTime);
-      formData.append("date", this.date);
-      formData.append("user_id", this.user_id);
-      formData.append("trailer_url", this.trailer_url);
+        const formData = new FormData();
+        formData.append("name", this.name);
+        formData.append("rating", this.rating);
+        formData.append("tags", this.tags);
+        formData.append("ticket_price", this.ticketPrice);
+        formData.append("theatre_id", theatreId);
+        formData.append("start_time", this.startTime);
+        formData.append("end_time", this.endTime);
+        formData.append("date", this.date);
+        formData.append("user_id", this.user_id);
+        formData.append("trailer_url", this.trailer_url);
 
-      var posterFile = null;
-      if(this.posterApi){
-        posterFile = new File([this.posterApi], "poster.jpg", {
-          type: this.posterApi.type,
-        });
+        var posterFile = null;
+        if (this.posterApi) {
+          posterFile = new File([this.posterApi], "poster.jpg", {
+            type: this.posterApi.type,
+          });
+        }
+        formData.append("poster", posterFile);
+
+        // Make API call to create a new show
+        axios
+          .put(`http://localhost:5000/api/shows/${this.showId}`, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data", // Set the content type to handle file upload
+            },
+          })
+          .then((response) => {
+            console.log("Show created successfully:", response.data);
+            // Redirect to the ShowList page after successful creation
+            this.$router.push("/AdminHome");
+          })
+          .catch((error) => {
+            console.error("Error creating show:", error);
+          });
       }
-      formData.append("poster", posterFile);
-
-
-      // Make API call to create a new show
-      axios
-        .put(`http://localhost:5000/api/shows/${this.showId}`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data", // Set the content type to handle file upload
-          },
-        })
-        .then((response) => {
-          console.log("Show created successfully:", response.data);
-          // Redirect to the ShowList page after successful creation
-          this.$router.push("/AdminHome");
-        })
-        .catch((error) => {
-          console.error("Error creating show:", error);
-        });
     },
 
     formatTime,

@@ -6,6 +6,7 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token
 from datetime import datetime
 from zoneinfo import ZoneInfo
+import re
 
 bcrypt = Bcrypt()
 
@@ -23,6 +24,12 @@ def signup():
     # Check if the email is already taken
     if User.query.filter_by(email=email).first():
         return jsonify({'message': 'Email address already registered. Please use a different email.'}), 400
+    
+    if not re.search('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+        return jsonify({'message':"Please choose a valid email."}),400
+    
+    if not re.search('^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{5,}$', password):
+        return jsonify({'message':"Password should be at least 5 characters long with at least a lowercase letter, an uppercase letter and a digit."}),400
 
     # Create a new user and save it to the database
     new_user = User(username=username, email=email, password=password, is_admin=isAdmin,last_visit=datetime.now(tz=ZoneInfo('Asia/Kolkata')))

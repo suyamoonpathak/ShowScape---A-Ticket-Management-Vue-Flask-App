@@ -10,7 +10,6 @@ def get_theatres_for_admin(admin_id):
     try:
         cached_data = redis_client.get(f'theatres_for_admin_{admin_id}')
         if cached_data:
-            print("from cache")
             return cached_data, 200
         theatres = Theatre.query.filter_by(admin_id=admin_id).all()
         theatres_data = [theatre.as_dict() for theatre in theatres]
@@ -25,7 +24,6 @@ def get_theatres_for_admin(admin_id):
 def get_theatre_by_id(theatre_id):
     cached_data = redis_client.get(f'theatres_by_id_{theatre_id}')
     if cached_data:
-        print("from cache")
         return cached_data, 200
     theatre = Theatre.query.get(theatre_id)
     if theatre:
@@ -63,7 +61,6 @@ def delete_theatre(theatre_id):
         shows = Show.query.filter_by(theatre_id=theatre_id).all()
         for show in shows:
             bookings = Booking.query.filter_by(show_id=show.id).all()
-            print(bookings)
             for booking in bookings:
                 db.session.delete(booking)
             db.session.delete(show)

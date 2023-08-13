@@ -13,6 +13,9 @@ import redis
 import asyncio
 import os
 import csv
+import plotly.graph_objects as go
+import plotly.io as pio
+import base64
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -55,12 +58,10 @@ app.config['MAIL_USE_SSL'] = False
 # Create a Flask-Mail instance
 mail = Mail(app)
 
-
 scheduler = APScheduler()
 
 def generate_monthly_report(user_id):
     # Calculate the date range for the previous month
-    print(user_id)
     today = datetime.today()
     first_day_of_previous_month = datetime(today.year, today.month - 1, 1)
     last_day_of_previous_month = first_day_of_previous_month.replace(day=28) + timedelta(days=4)
@@ -97,10 +98,19 @@ def generate_monthly_report(user_id):
         }
         booking_list.append(booking_info)
 
+    total_price = round(sum(booking['num_tickets'] * booking['show']['ticket_price'] for booking in booking_list),2)
 
-    print(booking_list)
-    total_price = sum(booking['num_tickets'] * booking['show']['ticket_price'] for booking in booking_list)
-    report_html = render_template('monthly_report.html', booking_list=booking_list,total_price=total_price)
+     # Create data for the pie chart
+    labels = [booking['show']['name'] for booking in booking_list]
+    values = [booking['num_tickets'] * booking['show']['ticket_price'] for booking in booking_list]
+
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
+
+    # Convert the Plotly chart to a base64-encoded image
+    chart_image_base64 = pio.to_image(fig, format='png')
+    chart_image_data = base64.b64encode(chart_image_base64).decode('utf-8')
+
+    report_html = render_template('monthly_report.html', booking_list=booking_list,total_price=total_price,chart_image_data=chart_image_data)
     return report_html
 
 from .models import reminder_recipients,all_users
@@ -111,7 +121,6 @@ def send_daily_reminders():
             body = f"Hey buddy!\n\nDon't forget to catch up with the new shows!\n\nShowscape"
             msg = Message(subject=subject, recipients=reminder_recipients(), body=body, sender="suyamoonpathak@gmail.com")
             try:
-                print(msg)
                 mail.send(msg)
                 print(f"Reminder sent successfully")
             except Exception as e:
@@ -132,11 +141,11 @@ def send_entertainment_report():
             except Exception as e:
                 print(f"Error sending report: {e}")
 
-hour_of_schedule = 22
-minute_of_schedule = 52
+hour_of_schedule = 20
+minute_of_schedule = 0
 
 scheduler.add_job(id="reminder-job", func=send_daily_reminders, trigger='cron', hour=hour_of_schedule, minute=minute_of_schedule)
-scheduler.add_job(id="entertainment-report-job", func=send_entertainment_report, trigger='cron', day=11, hour=hour_of_schedule, minute=minute_of_schedule) #need to make it first of every month
+scheduler.add_job(id="entertainment-report-job", func=send_entertainment_report, trigger='cron', day=1, hour=hour_of_schedule, minute=minute_of_schedule)
 
 scheduler.start()
 
@@ -198,8 +207,20 @@ async def send_email_async(recipient_email, file_path, theatreId):
     mail.send(message)
 
 
+def create_default_admin():
+    if db.session.query(User).count() == 0:
+        admin = User(
+            username="admin",
+            password="admin1Password",
+            email="admin@showscape.com",
+            is_admin=True,
+            last_visit=datetime.now()
+        )
+        db.session.add(admin)
+        db.session.commit()
 
 from .models import User, Theatre, Show, Booking
 with app.app_context():
     db.create_all()
+    create_default_admin()
 

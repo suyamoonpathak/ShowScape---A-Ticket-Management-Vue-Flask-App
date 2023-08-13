@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-import TestComponent from "../components/common/TestComponent";
 import SignUp from "../components/pages/SignUp";
 import SignIn from "../components/pages/SignIn";
 import ClientHome from "../components/pages/ClientHome";
@@ -21,11 +20,6 @@ import BookingSuccess from "@/components/pages/BookingManagement/BookingSuccess"
 import BookingFailed from "@/components/pages/BookingManagement/BookingFailed";
 
 const routes = [
-  {
-    path: "/test",
-    name: "Test",
-    component: TestComponent,
-  },
   {
     path: "/signup",
     component: SignUp,
@@ -86,13 +80,13 @@ const routes = [
     path: "/create-show/:id",
     name: "CreateShow",
     component: CreateShow,
-    meta: { requiresAuth: true, isAdmin: true }, // Add meta data for authentication and role check
+    meta: { requiresAuth: true, requiredRole: "admin" },
   },
   {
     path: "/edit-show/:theaterid/:showid/",
     name: "EditShow",
     component: EditShow,
-    meta: { requiresAuth: true, isAdmin: true }, // Add meta data for authentication and role check
+    meta: { requiresAuth: true, requiredRole: "admin"},
   },
   { 
     path: "/booking-success", 
@@ -104,7 +98,8 @@ const routes = [
   },
   {
     path:"/my-bookings",
-    component: MyBookings
+    component: MyBookings,
+    meta: { requiresAuth: true, requiredRole: "client"},
   },
   {
     path: "/:catchAll(.*)", // Use a param with a custom regexp
@@ -140,7 +135,7 @@ router.beforeEach((to, from, next) => {
 
     if (userRole !== requiredRole) {
       // If the user's role does not match the required role, redirect to an error page or a page with an "Unauthorized" message
-      next({ name: "Test" }); // Replace 'Unauthorized' with the route name for the unauthorized page or message
+      next({ name: "ErrorPage", params: { errorCode: 403 } }); 
     } else {
       next(); // Proceed with the navigation
     }

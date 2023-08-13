@@ -28,7 +28,7 @@
         pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{5,}$"
         @update:value="password = $event"
       />
-      <CustomCheckbox :value="isAdmin" @input="isAdmin = $event">
+      <CustomCheckbox v-model="isAdmin" @input="isAdmin = $event">
         I am an Admin
       </CustomCheckbox>
       <CustomAppButton class="primary" @click="submit">Sign Up</CustomAppButton>
@@ -70,35 +70,39 @@ export default {
   },
   methods: {
     submit() {
-      const userData = {
-        username: this.username,
-        email: this.email,
-        password: this.password,
-        isAdmin:this.isAdmin
-      };
+      if (!this.username || !this.email || !this.password) {
+        alert("Enter all the fields");
+      } else {
+        const userData = {
+          username: this.username,
+          email: this.email,
+          password: this.password,
+          isAdmin: this.isAdmin,
+        };
 
-      // Make an API call to the backend to register the user
-      axios
-        .post("http://localhost:5000/api/signup", userData)
-        .then((response) => {
-          // Handle the response (e.g., show success message, redirect to login)
-          localStorage.setItem('access_token', response.data.access_token);
-          const accessToken = localStorage.getItem('access_token');
-          const jwtPayload = decodeJwtToken(accessToken);
-          const role = jwtPayload.role;
+        // Make an API call to the backend to register the user
+        axios
+          .post("http://localhost:5000/api/signup", userData)
+          .then((response) => {
+            // Handle the response (e.g., show success message, redirect to login)
+            localStorage.setItem("access_token", response.data.access_token);
+            const accessToken = localStorage.getItem("access_token");
+            const jwtPayload = decodeJwtToken(accessToken);
+            const role = jwtPayload.role;
 
-          if (role === 'admin') {
-            this.$router.push('/AdminHome');
-          } else {
-            this.$router.push('/ClientHome');
-          }
-        })
-        .catch((error) => {
-          // Handle error (e.g., show error message)
-          console.error("User signup failed:", error.response.data);
-          // Show error message to the user
-          alert("Signup failed. Please try again.");
-        });
+            if (role === "admin") {
+              this.$router.push("/AdminHome");
+            } else {
+              this.$router.push("/ClientHome");
+            }
+          })
+          .catch((error) => {
+            // Handle error (e.g., show error message)
+            console.error("User signup failed:", error.response.data);
+            // Show error message to the user
+            alert("Signup failed. Please try again.");
+          });
+      }
     },
   },
 };
@@ -124,7 +128,7 @@ export default {
   background-position: center;
 }
 
-.primary{
+.primary {
   margin: 5% auto;
 }
 </style>

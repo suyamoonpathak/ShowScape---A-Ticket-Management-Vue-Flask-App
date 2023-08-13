@@ -135,44 +135,50 @@ export default {
   },
   methods: {
     submitForm() {
-      const theatreId = this.$route.params.id;
+      if (!this.name || !this.rating || !this.tags || !this.ticketPrice || !this. startTime || !this.endTime || !this.date || !this.trailer_url) {
+        alert("Enter all the fields");
+      } else if(!this.posterApi){
+        alert("Choose a poster image")
+      } else {
+        const theatreId = this.$route.params.id;
 
-      const formData = new FormData();
-      formData.append("name", this.name);
-      formData.append("rating", this.rating);
-      formData.append("tags", this.tags);
-      formData.append("ticket_price", this.ticketPrice);
-      formData.append("theatre_id", theatreId);
-      formData.append("start_time", this.startTime);
-      formData.append("end_time", this.endTime);
-      formData.append("date", this.date);
-      formData.append("user_id", this.user_id);
-      formData.append("trailer_url", this.trailer_url);
+        const formData = new FormData();
+        formData.append("name", this.name);
+        formData.append("rating", this.rating);
+        formData.append("tags", this.tags);
+        formData.append("ticket_price", this.ticketPrice);
+        formData.append("theatre_id", theatreId);
+        formData.append("start_time", this.startTime);
+        formData.append("end_time", this.endTime);
+        formData.append("date", this.date);
+        formData.append("user_id", this.user_id);
+        formData.append("trailer_url", this.trailer_url);
 
-      var posterFile = null;
-      if (this.posterApi) {
-        posterFile = new File([this.posterApi], "poster.jpg", {
-          type: this.posterApi.type,
-        });
+        var posterFile = null;
+        if (this.posterApi) {
+          posterFile = new File([this.posterApi], "poster.jpg", {
+            type: this.posterApi.type,
+          });
+        }
+        formData.append("poster", posterFile);
+        // formData.append("poster",this.poster);
+
+        // Make API call to create a new show
+        axios
+          .post("http://localhost:5000/api/shows", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data", // Set the content type to handle file upload
+            },
+          })
+          .then((response) => {
+            console.log("Show created successfully:", response.data);
+            // Redirect to the ShowList page after successful creation
+            this.$router.push("/AdminHome");
+          })
+          .catch((error) => {
+            console.error("Error creating show:", error);
+          });
       }
-      formData.append("poster", posterFile);
-      // formData.append("poster",this.poster);
-
-      // Make API call to create a new show
-      axios
-        .post("http://localhost:5000/api/shows", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data", // Set the content type to handle file upload
-          },
-        })
-        .then((response) => {
-          console.log("Show created successfully:", response.data);
-          // Redirect to the ShowList page after successful creation
-          this.$router.push("/AdminHome");
-        })
-        .catch((error) => {
-          console.error("Error creating show:", error);
-        });
     },
     getUserId() {
       const accessToken = localStorage.getItem("access_token");
@@ -245,18 +251,18 @@ export default {
     margin: 0px;
   }
 
-  .form{
+  .form {
     display: flex;
     flex-direction: column;
     align-items: center;
   }
 
-  .upload-poster-btn{
+  .upload-poster-btn {
     margin: 0;
     margin-right: 15px;
   }
 
-  .full-page{
+  .full-page {
     padding-bottom: 20px;
   }
 }

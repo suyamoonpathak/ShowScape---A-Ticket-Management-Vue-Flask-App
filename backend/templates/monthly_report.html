@@ -1,10 +1,11 @@
 <html>
   <head>
-    <title>Monthly Entertainment Report</title>
+    <title>Showscape</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   </head>
   <body>
-    <h1>Monthly Entertainment Report</h1>
-    <table border="1">
+    <h1 class="heading">Showscape Monthly Entertainment Report</h1>
+    <table>
       <tr>
         <th>Show</th>
         <th>Rating</th>
@@ -22,36 +23,47 @@
       </tr>
       {% endfor %}
     </table>
-    <h1>Total for this month: ${{ total_price }}</h1>
-    <div id="pie-chart"></div>
-
-    <script src="https://cdn.jsdelivr.net/npm/plotly@5.3.1/dist/plotly.min.js"></script>
-    <script type="text/javascript">
-      var total_price = {{ total_price }};
-      var booking_list = {{ booking_list | tojson }};
-
-      var labels = [];
-      var values = [];
-
-      for (var i = 0; i < booking_list.length; i++) {
-        labels.push(booking_list[i].show.name);
-        values.push(booking_list[i].num_tickets * booking_list[i].show.ticket_price);
-      }
-
-      var data = [
-        {
-          values: values,
-          labels: labels,
-          type: 'pie'
-        }
-      ];
-
-      var layout = {
-        height: 400,
-        width: 500
-      };
-
-      Plotly.newPlot('pie-chart', data, layout);
-    </script>
+    <h1>Total spent on this month: ${{ total_price }}</h1>
+    <div id="pie-chart">
+      <img src="data:image/png;base64,{{ chart_image_data }}" alt="Pie Chart">
+    </div>
   </body>
 </html>
+<style>
+body{
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  padding: 5% 10%;
+}
+
+.heading{
+  width: 100%;
+  text-align: center;
+}
+
+table{
+  width: 100%;
+}
+
+th,td{
+  padding: 2%;
+}
+
+tr:nth-child(even) {
+  background-color: rgba(150, 212, 212, 0.4);
+}
+
+th:nth-child(even),td:nth-child(even) {
+  background-color: rgba(150, 212, 212, 0.4);
+}
+
+@media (max-width: 768px) {
+  img {
+    width: 100%;
+  }
+}
+
+
+</style>

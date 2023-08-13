@@ -173,9 +173,8 @@ def update_show(show_id):
     user_id = data.get('user_id')
     trailer_url = data.get('trailer_url')
     posterImg = request.files.get('poster')
-    available_seats = data.get('available_seats')
 
-    if not name or not rating or not ticket_price or not theatre_id or not start_time or not end_time or not date or not user_id or not trailer_url or not posterImg or not available_seats:
+    if not name or not rating or not ticket_price or not theatre_id or not start_time or not end_time or not date or not user_id or not trailer_url:
         return jsonify({'message': 'Name, rating, ticket price, start time, end time, date, trailer url, poster, user id and theatre ID are required.'}), 400
 
     show = Show.query.get(show_id)
@@ -184,10 +183,12 @@ def update_show(show_id):
 
     if not Theatre.query.filter_by(id=theatre_id).first():
         return jsonify({'message': 'Theatre with given ID does not exist.'}), 404
-
-    filename = str(uuid.uuid1()) + "_" + secure_filename(posterImg.filename)
-    filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-    posterImg.save(filepath)
+    
+    if posterImg:
+        filename = str(uuid.uuid1()) + "_" + secure_filename(posterImg.filename)
+        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+        posterImg.save(filepath)
+        show.poster = filename
 
     show.name = name
     show.rating = rating
@@ -199,8 +200,6 @@ def update_show(show_id):
     show.date = date
     show.user_id = user_id
     show.trailer_url = trailer_url
-    show.poster = filename
-    show.available_seats = available_seats
     db.session.commit()
 
     return jsonify({'message': 'Show updated successfully.'}), 200
@@ -213,7 +212,6 @@ def delete_show(show_id):
         return jsonify({'message': 'Show with given ID does not exist.'}), 404
 
     bookings = Booking.query.filter_by(show_id=show_id).all()
-    print(bookings)
 
     for booking in bookings:
         db.session.delete(booking)
@@ -228,7 +226,6 @@ def delete_show(show_id):
 def search_shows():
     cached_data = redis_client.get('search_results')
     if cached_data:
-        print("search cache")
         return cached_data,200
 
     # Get the search query from query parameters

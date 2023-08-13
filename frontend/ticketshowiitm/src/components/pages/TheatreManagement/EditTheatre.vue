@@ -1,37 +1,36 @@
 <template>
   <div class="full-page">
-  <div class="edit-theatre-page">
-    <CustomHeading1 class="heading">Edit Theatre</CustomHeading1>
-    
-    <form @submit.prevent="submit">
-      <CustomInputText
-        label="Name"
-        type="text"
-        placeholder="Enter updated name"
-        :value="name"
-        @update:value="name = $event"
-      />
-      <CustomInputText
-        label="Place"
-        type="text"
-        placeholder="Enter updated place"
-        :value="place"
-        @update:value="place = $event"
-      />
-      <CustomInputText
-        label="Capacity"
-        type="number"
-        placeholder="Enter updated capacity"
-        :value="capacity"
-        @update:value="capacity = $event"
-      />
-      <div class="btn">
-        <CustomAppButton type="submit">Save Changes</CustomAppButton>
-      </div>
-      
-    </form>
+    <div class="edit-theatre-page">
+      <CustomHeading1 class="heading">Edit Theatre</CustomHeading1>
+
+      <form @submit.prevent="submit">
+        <CustomInputText
+          label="Name"
+          type="text"
+          placeholder="Enter updated name"
+          :value="name"
+          @update:value="name = $event"
+        />
+        <CustomInputText
+          label="Place"
+          type="text"
+          placeholder="Enter updated place"
+          :value="place"
+          @update:value="place = $event"
+        />
+        <CustomInputText
+          label="Capacity"
+          type="number"
+          placeholder="Enter updated capacity"
+          :value="capacity"
+          @update:value="capacity = $event"
+        />
+        <div class="btn">
+          <CustomAppButton type="submit">Save Changes</CustomAppButton>
+        </div>
+      </form>
+    </div>
   </div>
-</div>
 </template>
 
 <script>
@@ -51,7 +50,9 @@ export default {
     };
   },
   components: {
-    CustomHeading1,CustomInputText,CustomAppButton
+    CustomHeading1,
+    CustomInputText,
+    CustomAppButton,
   },
   mounted() {
     // Fetch the theatre details from the backend API based on the route parameter 'id'
@@ -73,27 +74,31 @@ export default {
         });
     },
     submit() {
-      const updatedTheatre = {
-        name: this.name,
-        place: this.place,
-        capacity: this.capacity,
-      };
-      // Make an API call to update the theatre details based on 'theatreId'
-      // Replace the URL with your backend API endpoint for updating theatre details
-      axios
-        .put(
-          `http://localhost:5000/api/theatres/${this.theatreId}`,
-          updatedTheatre
-        )
-        .then((response) => {
-          console.log("Theatre updated successfully:", response.data);
-          // Redirect back to the theatre details page after successful update
-          this.$router.push("/AdminHome");
-        })
-        .catch((error) => {
-          console.error("Error updating theatre:", error);
-          // Show error message to the user if needed
-        });
+      if (!this.name || !this.place || !this.capacity) {
+        alert("Enter all the fields");
+      } else {
+        const updatedTheatre = {
+          name: this.name,
+          place: this.place,
+          capacity: this.capacity,
+        };
+        // Make an API call to update the theatre details based on 'theatreId'
+        // Replace the URL with your backend API endpoint for updating theatre details
+        axios
+          .put(
+            `http://localhost:5000/api/theatres/${this.theatreId}`,
+            updatedTheatre
+          )
+          .then((response) => {
+            console.log("Theatre updated successfully:", response.data);
+            // Redirect back to the theatre details page after successful update
+            this.$router.push("/AdminHome");
+          })
+          .catch((error) => {
+            console.error("Error updating theatre:", error);
+            // Show error message to the user if needed
+          });
+      }
     },
   },
 };
@@ -106,17 +111,17 @@ export default {
   width: 50%;
 }
 
-.full-page{
+.full-page {
   display: flex;
   justify-content: center;
   padding-top: 10%;
 }
 
-.heading{
+.heading {
   text-align: center;
 }
 
-.btn{
+.btn {
   display: flex;
   justify-content: center;
   align-items: center;

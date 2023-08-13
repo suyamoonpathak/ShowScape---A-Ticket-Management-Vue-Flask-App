@@ -56,31 +56,35 @@ export default {
   },
   methods: {
     submit() {
-      const userData = {
-        username: this.username,
-        password: this.password,
-      };
+      if (!this.username || !this.password) {
+        alert("Enter all the fields!");
+      } else {
+        const userData = {
+          username: this.username,
+          password: this.password,
+        };
 
-      axios
-        .post("http://localhost:5000/api/signin", userData)
-        .then((response) => {
-          localStorage.setItem("access_token", response.data.access_token);
+        axios
+          .post("http://localhost:5000/api/signin", userData)
+          .then((response) => {
+            localStorage.setItem("access_token", response.data.access_token);
 
-          const accessToken = localStorage.getItem("access_token");
-          const jwtPayload = decodeJwtToken(accessToken);
-          const role = jwtPayload.role;
+            const accessToken = localStorage.getItem("access_token");
+            const jwtPayload = decodeJwtToken(accessToken);
+            const role = jwtPayload.role;
 
-          if (role == "admin") {
-            this.$router.push("/AdminHome");
-          } else {
-            this.$router.push("/ClientHome");
-          }
-        })
-        .catch((error) => {
-          console.error("User signup failed:", error.response.data);
-          this.hasError = true;
-          this.errorMessage = "Credentials don't match. Please try again";
-        });
+            if (role == "admin") {
+              this.$router.push("/AdminHome");
+            } else {
+              this.$router.push("/ClientHome");
+            }
+          })
+          .catch((error) => {
+            console.error("User signup failed:", error.response.data);
+            this.hasError = true;
+            this.errorMessage = "Credentials don't match. Please try again";
+          });
+      }
     },
   },
 };
@@ -110,7 +114,7 @@ export default {
   margin: 5% auto;
 }
 
-.error-message{
+.error-message {
   margin-top: 2%;
 }
 </style>
