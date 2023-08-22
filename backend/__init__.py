@@ -21,9 +21,10 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:8080"}})
 
-app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_PATH
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_PATH')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = JWT_SECRET
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET')
+
 
 celery = Celery(app.name, broker='redis://localhost:6379/0', backend='redis://localhost:6379/0')
 celery.conf.update(app.config)
@@ -35,7 +36,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
-stripe.api_key = STRIPE_SECRET_KEY
+stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 
 from .authentication import authentication
 from .theatre_management import theatre_management
@@ -50,8 +51,8 @@ app.register_blueprint(booking_management,url_prefix="/")
 # Set up email configuration
 app.config['MAIL_SERVER']='sandbox.smtp.mailtrap.io'
 app.config['MAIL_PORT'] = 587
-app.config['MAIL_USERNAME'] = MAILTRAP_USERNAME
-app.config['MAIL_PASSWORD'] = MAILTRAP_PASSWORD
+app.config['MAIL_USERNAME'] = os.environ.get('MAILTRAP_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAILTRAP_PASSWORD')
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 
