@@ -8,7 +8,6 @@ import stripe
 from flask_mail import Mail, Message
 from flask_apscheduler import APScheduler
 from datetime import datetime, timedelta
-from celery import Celery
 import redis
 import asyncio
 import os
@@ -26,8 +25,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET')
 
 
-celery = Celery(app.name, broker='redis://localhost:6379/0', backend='redis://localhost:6379/0')
-celery.conf.update(app.config)
 redis_client=redis.Redis(host='localhost',port=6379, db=0)
 
 UPLOAD_FOLDER = path.join(path.dirname(
