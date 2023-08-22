@@ -5,7 +5,7 @@ APScheduler==3.6.3
 asyncio==3.4.3
 Babel==2.12.1
 bcrypt==4.0.1
-celery==5.3.1
+celery==5.3.0
 config==0.5.1
 Flask-APScheduler==1.12.4
 Flask-BabelEx==0.9.4
