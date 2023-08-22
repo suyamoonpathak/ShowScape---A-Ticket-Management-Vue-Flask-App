@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -215,6 +215,11 @@ def create_default_admin():
         )
         db.session.add(admin)
         db.session.commit()
+
+@app.route('/api/get_image/<filename>')
+def get_image(filename):
+    image_path = f'./static/images/{filename}'
+    return send_file(image_path, mimetype='image/jpeg')
 
 from .models import User, Theatre, Show, Booking
 with app.app_context():

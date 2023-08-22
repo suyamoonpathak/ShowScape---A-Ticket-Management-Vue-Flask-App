@@ -21,7 +21,7 @@
             <img
             v-if="show.poster"
             :src="
-              require(`./../../../../../../backend/static/images/${show.poster}`)
+              getImageUrl(show.poster)
             "
             alt="Poster Image"
             class="poster"
@@ -127,6 +127,7 @@ import StarRating from "vue-star-rating";
 import { formatTime } from "./../../../../utils/formatTimeUtils";
 import { formatDate } from "./../../../../utils/formatDateUtils";
 import { formatCSV } from "./../../../../utils/formatCSVUtils";
+import { getImageUrl } from "./../../../../utils/getImage";
 import { calculateDuration } from "./../../../../utils/timeDifferenceUtils";
 import { decodeJwtToken } from "./../../../../utils/jwtUtils";
 import { StripeCheckout } from "@vue-stripe/vue-stripe";
@@ -168,13 +169,13 @@ export default {
       try {
         // Fetch show details
         const showResponse = await axios.get(
-          `http://localhost:5000/api/shows/${showId}`
+          `https://showscape-backend.onrender.com/api/shows/${showId}`
         );
         this.show = showResponse.data;
 
         // Fetch theater details using the theater_id from the show object
         const theaterResponse = await axios.get(
-          `http://localhost:5000/api/theatres/${this.show.theatre_id}`
+          `https://showscape-backend.onrender.com/api/theatres/${this.show.theatre_id}`
         );
         this.theater = theaterResponse.data;
       } catch (error) {
@@ -185,6 +186,7 @@ export default {
     formatDate,
     formatCSV,
     calculateDuration,
+    getImageUrl,
     goToTrailer() {
       const trailerUrl = this.show.trailer_url;
       if (trailerUrl) {
@@ -202,10 +204,6 @@ export default {
       const accessToken = localStorage.getItem("access_token");
       const jwtPayload = decodeJwtToken(accessToken);
       return jwtPayload.user_id;
-    },
-    getPosterImageUrl(posterFilename) {
-      const imagePath = "./../../../../../../backend/static/images/";
-      return `${imagePath}${posterFilename}`;
     },
     decreaseTickets() {
       if (this.numberOfTickets > 1) {
@@ -227,7 +225,7 @@ export default {
       try {
         // Fetch show details
         const sessionResponse = await axios.post(
-          "http://localhost:5000/api/checkout",
+          "https://showscape-backend.onrender.com/api/checkout",
           {
             user_id: userId,
             ticket_price: ticket_price,

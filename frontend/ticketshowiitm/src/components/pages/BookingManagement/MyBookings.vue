@@ -40,7 +40,7 @@ export default {
       try {
         // Fetch the user's bookings using the API endpoint
         const response = await axios.get(
-          `http://localhost:5000/api/users/${userId}/bookings`
+          `https://showscape-backend.onrender.com/api/users/${userId}/bookings`
         );
         this.bookings = response.data;
       } catch (error) {

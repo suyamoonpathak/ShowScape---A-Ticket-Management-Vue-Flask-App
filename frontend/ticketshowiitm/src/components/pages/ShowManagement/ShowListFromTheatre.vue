@@ -24,7 +24,7 @@
     methods: {
       getShowsForTheatre() {
         // Make API call to get all shows for a theatre
-        axios.get(`http://localhost:5000/api/shows/theatre/${this.theatreId}`)
+        axios.get(`https://showscape-backend.onrender.com/api/shows/theatre/${this.theatreId}`)
           .then((response) => {
             this.shows = response.data;
           })

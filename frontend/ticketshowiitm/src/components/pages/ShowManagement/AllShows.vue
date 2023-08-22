@@ -39,7 +39,7 @@ export default {
   methods: {
     fetchShows() {
       axios
-        .get("http://localhost:5000/api/shows")
+        .get("https://showscape-backend.onrender.com/api/shows")
         .then((response) => {
           // Update the 'shows' data with the fetched shows from the backend
           this.shows = response.data;

@@ -71,7 +71,7 @@ export default {
         // Make an API call to update the theatre details based on 'theatreId'
         // Replace the URL with your backend API endpoint for updating theatre details
         axios
-          .post("http://localhost:5000/api/theatres", newTheatre)
+          .post("https://showscape-backend.onrender.com/api/theatres", newTheatre)
           .then((response) => {
             console.log("Theatre updated successfully:", response.data);
             // Redirect back to the theatre details page after successful update

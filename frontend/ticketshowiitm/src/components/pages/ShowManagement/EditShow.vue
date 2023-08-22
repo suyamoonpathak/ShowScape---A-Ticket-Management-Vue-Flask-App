@@ -108,6 +108,7 @@ import CustomAppButton from "../../common/CustomAppButton.vue";
 import { formatTime } from "./../../../../utils/formatTimeUtils";
 import { formatDate } from "./../../../../utils/formatDateUtils";
 import { decodeJwtToken } from "./../../../../utils/jwtUtils";
+import { getImageUrl } from "./../../../../utils/getImage";
 
 export default {
   name: "EditShow",
@@ -143,7 +144,7 @@ export default {
       // Make an API call to fetch the show details based on 'showId'
       // Replace the URL with your backend API endpoint for fetching show details
       await axios
-        .get(`http://localhost:5000/api/shows/${this.showId}`)
+        .get(`https://showscape-backend.onrender.com/api/shows/${this.showId}`)
         .then((response) => {
           this.name = response.data.name;
           this.rating = response.data.rating;
@@ -153,7 +154,7 @@ export default {
           this.endTime = formatTime(response.data.end_time);
           this.date = formatDate(response.data.date);
           this.trailer_url = response.data.trailer_url;
-          this.posterDisplay = require(`./../../../../../../backend/static/images/${response.data.poster}`);
+          this.posterDisplay = getImageUrl(response.data.poster);
         })
         .catch((error) => {
           console.error("Error fetching show details:", error);
@@ -196,7 +197,7 @@ export default {
 
         // Make API call to create a new show
         axios
-          .put(`http://localhost:5000/api/shows/${this.showId}`, formData, {
+          .put(`https://showscape-backend.onrender.com/api/shows/${this.showId}`, formData, {
             headers: {
               "Content-Type": "multipart/form-data", // Set the content type to handle file upload
             },
@@ -214,6 +215,7 @@ export default {
 
     formatTime,
     formatDate,
+    getImageUrl,
     getUserId() {
       const accessToken = localStorage.getItem("access_token");
       const jwtPayload = decodeJwtToken(accessToken);

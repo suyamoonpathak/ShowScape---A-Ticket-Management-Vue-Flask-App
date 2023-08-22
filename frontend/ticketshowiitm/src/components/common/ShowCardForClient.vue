@@ -3,7 +3,7 @@
     <div class="poster-div" @mouseover="zoomIn" @mouseleave="zoomOut">
       <img
         v-if="show.poster"
-        :src="require(`./../../../../../backend/static/images/${show.poster}`)"
+        :src="getImageUrl(show.poster)"
         alt="Poster Image"
         class="poster"
         @click="showDetails(show.id)"
@@ -44,6 +44,7 @@ import CustomTags from "./CustomTags.vue";
 import CustomParagraph from "./CustomParagraph.vue";
 import {getFirstThreeTags} from "./../../../utils/getFirstThreeTagsUtils"
 import {getFirstThreeWordsWithEllipsis} from "./../../../utils/getFirstThreeWordsWithEllipsisUtils"
+import { getImageUrl } from "./../../../utils/getImage";
 
 export default {
   props: {
@@ -74,7 +75,7 @@ export default {
     showDetails(showId) {
       // Redirect to ShowDetails page for the selected show
       this.$router.push(`/show/${showId}`);
-    }, getFirstThreeTags, getFirstThreeWordsWithEllipsis
+    }, getFirstThreeTags, getFirstThreeWordsWithEllipsis, getImageUrl
   },
 };
 </script>

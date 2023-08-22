@@ -46,7 +46,7 @@
       if (confirm('Are you sure you want to delete this show?')) {
         // Make an API call to delete the theatre
         axios
-          .delete(`http://localhost:5000/api/shows/${showid}`)
+          .delete(`https://showscape-backend.onrender.com/api/shows/${showid}`)
           .then((response) => {
             console.log('Theatre deleted successfully:', response.data);
             // After successful deletion, you may want to navigate back to the theatres list

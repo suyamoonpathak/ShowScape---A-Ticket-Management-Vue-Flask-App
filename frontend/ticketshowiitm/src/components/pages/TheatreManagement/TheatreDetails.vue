@@ -34,7 +34,7 @@
         const theatreId = this.$route.params.id;
         // Make an API call to fetch the theatre details based on 'theatreId'
         // Replace the URL with your backend API endpoint for fetching theatre details
-        axios.get(`http://localhost:5000/api/theatres/${theatreId}`)
+        axios.get(`https://showscape-backend.onrender.com/api/theatres/${theatreId}`)
           .then((response) => {
             this.theatre = response.data;
           })

@@ -83,7 +83,7 @@ export default {
 
         // Make an API call to the backend to register the user
         axios
-          .post("http://localhost:5000/api/signup", userData)
+          .post("https://showscape-backend.onrender.com/api/signup", userData)
           .then((response) => {
             // Handle the response (e.g., show success message, redirect to login)
             localStorage.setItem("access_token", response.data.access_token);

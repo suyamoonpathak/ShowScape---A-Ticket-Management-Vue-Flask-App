@@ -119,12 +119,12 @@ export default {
       // Make an API call to fetch the list of theatres
       // Replace the URL with your backend API endpoint for fetching theatres
       axios
-        .get(`http://localhost:5000/api/theatres/admin/${admin_id}`)
+        .get(`https://showscape-backend.onrender.com/api/theatres/admin/${admin_id}`)
         .then((response) => {
           this.theatres = response.data;
           this.theatres.forEach((theatre) => {
             axios
-              .get(`http://localhost:5000/api/shows/theatre/${theatre.id}`)
+              .get(`https://showscape-backend.onrender.com/api/shows/theatre/${theatre.id}`)
               .then((response) => {
                 this.shows.push(response.data);
               })
@@ -147,7 +147,7 @@ export default {
       if (confirm("Are you sure you want to delete this theatre?")) {
         // Make an API call to delete the theatre
         axios
-          .delete(`http://localhost:5000/api/theatres/${theatreId}`)
+          .delete(`https://showscape-backend.onrender.com/api/theatres/${theatreId}`)
           .then((response) => {
             console.log("Theatre deleted successfully:", response.data);
             // After successful deletion, you may want to navigate back to the theatres list
@@ -178,7 +178,7 @@ export default {
       alert("CSV export triggered");
       // Make an API call to trigger the CSV export
       axios
-        .get(`http://localhost:5000/api/export-csv/${theatreId}`) // Update the API endpoint
+        .get(`https://showscape-backend.onrender.com/api/export-csv/${theatreId}`) // Update the API endpoint
         .then((response) => {
           console.log("CSV export completed:", response.data);
           alert("CSV export completed. Please check your email for the file.");

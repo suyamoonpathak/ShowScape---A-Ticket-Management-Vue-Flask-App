@@ -63,7 +63,7 @@ export default {
       // Make an API call to fetch the theatre details based on 'theatreId'
       // Replace the URL with your backend API endpoint for fetching theatre details
       await axios
-        .get(`http://localhost:5000/api/theatres/${this.theatreId}`)
+        .get(`https://showscape-backend.onrender.com/api/theatres/${this.theatreId}`)
         .then((response) => {
           this.name = response.data.name;
           this.place = response.data.place;
@@ -86,7 +86,7 @@ export default {
         // Replace the URL with your backend API endpoint for updating theatre details
         axios
           .put(
-            `http://localhost:5000/api/theatres/${this.theatreId}`,
+            `https://showscape-backend.onrender.com/api/theatres/${this.theatreId}`,
             updatedTheatre
           )
           .then((response) => {

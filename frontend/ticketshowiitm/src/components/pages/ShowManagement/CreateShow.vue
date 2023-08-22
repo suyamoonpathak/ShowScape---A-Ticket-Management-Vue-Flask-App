@@ -165,7 +165,7 @@ export default {
 
         // Make API call to create a new show
         axios
-          .post("http://localhost:5000/api/shows", formData, {
+          .post("https://showscape-backend.onrender.com/api/shows", formData, {
             headers: {
               "Content-Type": "multipart/form-data", // Set the content type to handle file upload
             },

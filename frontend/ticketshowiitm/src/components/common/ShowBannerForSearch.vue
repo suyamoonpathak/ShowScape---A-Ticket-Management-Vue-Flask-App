@@ -3,7 +3,7 @@
     <div class="poster-img-div">
       <img
         v-if="show.poster"
-        :src="require(`./../../../../../backend/static/images/${show.poster}`)"
+        :src="getImageUrl(show.poster)"
         alt="Poster Image"
         class="poster"
         @click="showDetails(show.id)"
@@ -38,6 +38,7 @@ import CustomTags from './CustomTags.vue';
 import StarRating from "vue-star-rating";
 import { getFirstThreeTags } from './../../../utils/getFirstThreeTagsUtils';
 import { getFirstThreeWordsWithEllipsis } from './../../../utils/getFirstThreeWordsWithEllipsisUtils';
+import { getImageUrl } from "./../../../utils/getImage";
 
 export default {
   props: {
@@ -57,7 +58,7 @@ export default {
   methods:{
     redirectToShowDetails(){
       this.$router.push(`/show/${this.show.id}`)
-    },getFirstThreeTags,getFirstThreeWordsWithEllipsis
+    },getFirstThreeTags,getFirstThreeWordsWithEllipsis,getImageUrl
   }
 };
 </script>

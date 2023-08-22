@@ -41,7 +41,7 @@ export default {
       const jwtPayload = decodeJwtToken(accessToken);
       const admin_id = jwtPayload.admin_id;
       const response = await axios.get(
-        `http://localhost:5000/api/generate_arrays/${admin_id}`
+        `https://showscape-backend.onrender.com/api/generate_arrays/${admin_id}`
       );
       this.theatresData = response.data;
     } catch (error) {

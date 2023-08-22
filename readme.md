@@ -26,7 +26,7 @@ pip install -r requirements.txt
 python3 app.py
 ```
 
-The backend server will be running at http://localhost:5000.
+The backend server will be running at https://showscape-backend.onrender.com.
 
 ## Frontend Setup
 

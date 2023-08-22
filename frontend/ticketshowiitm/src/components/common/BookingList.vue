@@ -4,7 +4,7 @@
       <img
         v-if="booking.show.poster"
         :src="
-          require(`./../../../../../backend/static/images/${booking.show.poster}`)
+          getImageUrl(booking.show.poster)
         "
         alt="Poster Image"
         class="poster"
@@ -66,6 +66,7 @@ import { formatDate } from "./../../../utils/formatDateUtils";
 import { formatTime } from "./../../../utils/formatTimeUtils";
 import { getFirstThreeTags } from "./../../../utils/getFirstThreeTagsUtils";
 import { getFirstThreeWordsWithEllipsis } from "./../../../utils/getFirstThreeWordsWithEllipsisUtils";
+import { getImageUrl } from "./../../../utils/getImage";
 
 export default {
   props: {
@@ -96,6 +97,7 @@ export default {
     formatTime,
     getFirstThreeTags,
     getFirstThreeWordsWithEllipsis,
+    getImageUrl
   },
 };
 </script>
