@@ -17,7 +17,7 @@ import base64
 
 app = Flask(__name__)
 app.config.from_object(__name__)
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:8080"}})
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_PATH')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
