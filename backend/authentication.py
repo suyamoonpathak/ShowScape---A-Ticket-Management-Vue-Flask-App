@@ -5,7 +5,6 @@ authentication = Blueprint("authentication", __name__)
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token
 from datetime import datetime
-from zoneinfo import ZoneInfo
 import re
 
 bcrypt = Bcrypt()
@@ -32,7 +31,7 @@ def signup():
         return jsonify({'message':"Password should be at least 5 characters long with at least a lowercase letter, an uppercase letter and a digit."}),400
 
     # Create a new user and save it to the database
-    new_user = User(username=username, email=email, password=password, is_admin=isAdmin,last_visit=datetime.now(tz=ZoneInfo('Asia/Kolkata')))
+    new_user = User(username=username, email=email, password=password, is_admin=isAdmin,last_visit=datetime.now())
     db.session.add(new_user)
     db.session.commit()
 
@@ -69,7 +68,7 @@ def signin():
 
     # Generate an access token for the authenticated user
     if user:
-        user.last_visit = datetime.now(tz=ZoneInfo('Asia/Kolkata'))
+        user.last_visit = datetime.now()
         db.session.commit()
         if(user.is_admin):
             additional_claims = {
