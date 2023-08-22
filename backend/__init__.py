@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from os import path
-from .secrets import DATABASE_PATH, JWT_SECRET, STRIPE_SECRET_KEY, MAILTRAP_USERNAME, MAILTRAP_PASSWORD
 import stripe
 from flask_mail import Mail, Message
 from flask_apscheduler import APScheduler
