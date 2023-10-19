@@ -81,5 +81,44 @@ Enjoy using the TicketShowIITM app for managing theater shows and bookings!
 
 Here are some screenshots of the TicketShowIITM app:
 
+1. Sign Up Page
 ![Screenshot 1](Screenshots/signUpPage.png)
-![Screenshot 2](Screenshots/signInPage.png)
+
+2. Sign In Page
+![Screenshot 2](Screenshots/SignInPage.png)
+
+3. User Dashboard
+![Screenshot 2](Screenshots/userDashboard.png)
+
+4. Show Details
+![Screenshot 2](Screenshots/showDetails.png)
+
+5. Search Feature
+![Screenshot 2](Screenshots/searchFeature.png)
+
+6. User Bookings
+![Screenshot 2](Screenshots/userBookings.png)
+
+7. User Monthly Entertainment Report Email
+![Screenshot 2](Screenshots/UserMonthlyEntertainmentReport.png)
+
+8. User Reminder Email
+![Screenshot 2](Screenshots/User_reminder.png)
+
+9. Create Theatre
+![Screenshot 2](Screenshots/CreateTheatre.png)
+
+9. Create Show
+![Screenshot 2](Screenshots/CreateShow.png)
+
+9. Edit Theatre
+![Screenshot 2](Screenshots/editTheatre.png)
+
+9. Edit Show
+![Screenshot 2](Screenshots/editShow.png)
+
+10. Theatre Summary
+![Screenshot 2](Screenshots/theatreSummary.png)
+
+11. Theatre Report CSV in Email
+![Screenshot 2](Screenshots/TheatreReportInCSV.png)
