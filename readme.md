@@ -76,3 +76,10 @@ ngrok http 5000
 2. Go to http://localhost:8080 to access the TicketShowIITM app.
 
 Enjoy using the TicketShowIITM app for managing theater shows and bookings!
+
+## Screenshots
+
+Here are some screenshots of the TicketShowIITM app:
+
+![Screenshot 1](Screenshots/signUpPage.png)
+![Screenshot 2](Screenshots/signInPage.png)
